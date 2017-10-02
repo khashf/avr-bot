@@ -14,6 +14,11 @@ Port B, Pin 6 -> Output -> Left Motor Direction (0 -> roll backward, 1-> roll fo
 Port D, Pin 1 -> Input -> Left Whisker (Active Low: 0 -> has input, 1 -> no input)
 Port D, Pin 0 -> Input -> Right Whisker (Active Low: 0 -> has input, 1 -> no input)
 
+TODO
+
+- shift bit
+- 0x0 and 0xf ?
+
 */
 
 #define F_CPU 16000000
