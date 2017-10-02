@@ -1,7 +1,9 @@
 /*
-This code will cause a TekBot connected to the AVR board to
-move forward and when it touches an obstacle, it will reverse
-and turn away from the obstacle and resume forward motion.
+1. The bot moves forward indefinitely until it hits an object.
+2. The bot continues forward for a short period of time after hitting the object.
+3. The bot backs up slightly.
+4. The bot turns slightly toward the object.
+5. The bot returns to Step 1.
 
 PORT MAP
 
@@ -41,7 +43,7 @@ int main(void)
 	while (1)							// loop forever
 	{
 		if (PIND == 0b11111101)  {		// left whisker triggers
-			PORTB = 0b01100000;			// make TekBot move forward
+			PORTB = 0b01100000;			// make the bot move forward
 			_delay_ms(smallMovement);	// keep moving forward for 500 ms
 			PORTB = 0b00000000;			// move backward
 			_delay_ms(smallMovement);	// keep moving backward for 500 ms
@@ -50,7 +52,7 @@ int main(void)
 			
 		}
 		else if (PIND == 0b11111110) {	// right whisker triggers
-			PORTB = 0b01100000;			// make TekBot move forward
+			PORTB = 0b01100000;			// make the bot move forward
 			_delay_ms(smallMovement);	// keep moving forward for 500 ms
 			PORTB = 0b00000000;			// move backward
 			_delay_ms(smallMovement);	// keep moving backward for 500 ms
@@ -63,7 +65,7 @@ int main(void)
 			//PORTB = 0b01000000;			// turn right
 			//_delay_ms(turnTime);		// keep turning right for 1s
 		//}
-		PORTB = 0b01100000;				// make TekBot move forward
+		PORTB = 0b01100000;				// make the bot move forward
 		_delay_ms(bumpSensitivity);		// keep moving forward for 500 ms
 	}
 }
