@@ -11,7 +11,7 @@ Discarded input sections
  .data          0x00000000        0x0 dance_bot.o
  .bss           0x00000000        0x0 dance_bot.o
  .debug_line    0x00000000        0x0 dance_bot.o
- .debug_str     0x00000000       0xef dance_bot.o
+ .debug_str     0x00000000       0xe6 dance_bot.o
  .comment       0x00000000       0x31 dance_bot.o
  .text          0x00000000        0x0 bump_bot.o
  .data          0x00000000        0x0 bump_bot.o
@@ -395,11 +395,11 @@ END GROUP
  *(.debug_frame)
  .debug_frame   0x00000000       0x24 bump_bot.o
 
-.debug_str      0x00000000      0x425
+.debug_str      0x00000000      0x41c
  *(.debug_str)
  .debug_str     0x00000000      0x27d C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.132/gcc/dev/atmega128/avr51/crtatmega128.o
- .debug_str     0x0000027d      0x1a8 bump_bot.o
-                                0x1e1 (size before relaxing)
+ .debug_str     0x0000027d      0x19f bump_bot.o
+                                0x1d8 (size before relaxing)
 
 .debug_loc      0x00000000      0x1b0
  *(.debug_loc)
