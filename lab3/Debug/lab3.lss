@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.6  D:\Box Sync\ece375\ece375_code\lab3\main.asm Sun Oct 15 22:03:44 2017
+AVRASM ver. 2.2.6  D:\Box Sync\ece375\ece375_code\lab3\main.asm Sun Oct 15 23:52:40 2017
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
 D:\Box Sync\ece375\ece375_code\lab3\main.asm(19): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
@@ -1374,16 +1374,16 @@ D:\Box Sync\ece375\ece375_code\lab3\main.asm(19): Including file 'C:/Program Fil
 00005e e0d1                      		ldi		YH, $01				; Y = $0102
 00005f e0e4                      		ldi		ZL, $04				; 
 000060 e0f1                      		ldi		ZH, $01				; Z = $0104
-000061 912d                      		ld		A, X+				; A = M[X] -> A = M[$0100]	; X=X+1 -> X = $0101
-000062 9139                      		ld		B, Y+				; B = M[Y] -> B = M[$0102]	; Y=Y+1 -> Y = $0103
+000061 912d                      		ld		A, X+				; A = M[X] ; X=X+1
+000062 9139                      		ld		B, Y+				; B = M[Y] ; Y=Y+1
 000063 0f32                      		add		B, A				; B = B + A
-000064 9331                      		st		Z+, B				; M[Z] = B -> M[$0104] = B	; Z=Z+1 -> Z = $0105
-000065 912c                      		ld		A, X				; A = M[X] -> A = M[$0101]
-000066 8138                      		ld		B, Y				; B = M[Y] -> B = M[$0103]
-000067 1f32                      		adc		B, A				; B = B + A + (_carry_)		
-000068 9331                      		st		Z+, B				; M[Z] = B -> M[$0105] = B	; Z=Z+1 -> Z = $0106
+000064 9331                      		st		Z+, B				; M[Z] = B ; Z=Z+1
+000065 912c                      		ld		A, X				; A = M[X] 
+000066 8138                      		ld		B, Y				; B = M[Y] 
+000067 1f32                      		adc		B, A				; B = B + A + carry
+000068 9331                      		st		Z+, B				; M[Z] = B ; Z=Z+1
 000069 f408                      		brcc	EXIT				; if (carry=0), branch to EXIT 
-00006a 83b0                      		st		Z, XH				; if (carry=1), M[$0106] = $01
+00006a 83b0                      		st		Z, XH				; if (carry=1), M[Z] = HIGH(Z) = $01
                                  EXIT:
 00006b 9508                      		ret							; return from rcall
                                  
