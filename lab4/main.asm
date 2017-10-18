@@ -70,6 +70,7 @@ INIT:
 		;; Point X-register to the appropriate mem location
 		ldi		XH, $01
 		ldi		XL, $00
+		ldi		r25, 0
 
 		;; X, Y,Z register
 		;; X is for displaying
@@ -102,7 +103,7 @@ LOOP:
 		;out	PORTB, mpr		; Display the byte we just read onto the LCD Display
 
 		cp		ZL, YL			; Check if we have reached the end of string
-		breq	DONE1			; End of program
+		breq	DONE1			; End of program - scroll now
 
 		;; Move the 
 		;st		Y+, mpr			; DataMemory[Y] <- mpr, Y++
@@ -114,22 +115,33 @@ LOOP:
 
 SCROLL:
 		ldi		XH, $01			; X register holds first line pointer
-		ldi		XL, $00			
-		ldi		YH, $11			; Y register holds second line pointer
-		ldi		YL, $00
+		ldi		XL, $00
+		ld		r24, X+			; store new value in r24
+SCROLLLOOP:
+		mov		r23, r24		; copy r24 to r23
+		ld		r24, X			; now new value is in r23, old value in r24
+		st		X, r23			; store new value in X
+		adiw	X, 1
+		cpi		XH, $01
+		breq	SECONDCHECK
+		rjmp	SCROLLLOOP
 
-		;ldi	mpr, X
-		;ldi	line, 1
-		;ldi	count (X+offset)%16
+SECONDCHECK:
+		cpi		XL, $20			; we've reached the end!
+		breq	LASTCHAR
+		rjmp	SCROLLLOOP
 
-
+LASTCHAR:
+		ldi		XH, $01			; X register holds first line pointer
+		ldi		XL, $00
+		st		X, r24
+		rjmp	SCROLL
+		
 DONE1:	
 		cp		ZH, YH			; Check if we have reached the end of string
-		breq	DONE2			; TODO: When will this happen?
+		breq	SCROLL			; TODO: When will this happen?
 		rjmp	LOOP			; Loop infinte
 
-DONE2:
-		rjmp	DONE2			; Loop infinte
 ;***********************************************************
 ;*	Main Program
 ;***********************************************************
