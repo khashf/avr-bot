@@ -1,0 +1,35 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.6</VERSION>
+ <DEVICE>"ATmega128"</DEVICE>
+ <WORKING_DIR>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\Debug\lab1.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>lab1.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>lab1.map</FILE>
+  <FILE>lab1.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <INIT><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm</FILE><LINE>102</LINE></INIT>
+  <MAIN><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm</FILE><LINE>128</LINE></MAIN>
+  <NEXT><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm</FILE><LINE>135</LINE></NEXT>
+  <HitRight><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm</FILE><LINE>149</LINE></HitRight>
+  <HitLeft><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm</FILE><LINE>182</LINE></HitLeft>
+  <Wait><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm</FILE><LINE>218</LINE></Wait>
+  <Loop><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm</FILE><LINE>223</LINE></Loop>
+  <OLoop><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm</FILE><LINE>224</LINE></OLoop>
+  <ILoop><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm</FILE><LINE>225</LINE></ILoop>
+ </LABELS>
+</ASSEMBLER_INFO>

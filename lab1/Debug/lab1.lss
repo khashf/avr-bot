@@ -1,10 +1,10 @@
 
-AVRASM ver. 2.2.6  J:\ECE375\ece375_code\lab1\bump_bot_mod.asm Mon Oct 16 13:22:48 2017
+AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm Mon Oct 23 11:15:43 2017
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
-J:\ECE375\ece375_code\lab1\bump_bot_mod.asm(34): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
+\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm(34): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
-J:\ECE375\ece375_code\lab1\bump_bot_mod.asm(34): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
+\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm(34): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
                                  
                                  ;***********************************************************
                                  
