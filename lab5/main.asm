@@ -8,8 +8,8 @@
 ;*
 ;***********************************************************
 ;*
-;*	 Author: Enter your name
-;*	   Date: Enter Date
+;*	 Author: Trevor Swope, Khuong Luu
+;*	   Date: Oct. 30 2017
 ;*
 ;***********************************************************
 
@@ -24,7 +24,9 @@
 .def	zero = r2				; Zero register, set to zero in INIT, useful for calculations
 .def	A = r3					; A variable
 .def	B = r4					; Another variable
-
+.def	C = r19
+.def	D = r20
+.def    E = r21
 .def	oloop = r17				; Outer Loop Counter
 .def	iloop = r18				; Inner Loop Counter
 
@@ -91,7 +93,7 @@ MAIN:							; The Main program
 
 				; Call MUL24 function to test its correctness
 				; (calculate FFFFFF * FFFFFF)
-
+				rcall MUL24
 				; Observe result in Memory window
 
 		; Call the COMPOUND function
@@ -187,19 +189,102 @@ MUL24:
 		ldi		YL, low(MUL24_MULTIPLIER)	; Load low byte of address
 		ldi		YH, high(MUL24_MULTIPLIER) ; Load high byte of address
 		
-		; Load beginning address of result into Z
-		ldi		ZL, low(MUL24_Result)
-		ldi		ZH, high(MUL24_Result)
-		
 		; store the bit string we want to go over into data mem
 		; use X register to iterate through it
 		; we have a counter for each interation, we increment counter until reach 24
-		
-			; for each iteration
-			; if bit at the counter value is 1:
-				; copy the multiplicand into data mem
-				; shift multiplicand left by the counter value
-				; add to the result
+		ldi oloop, 0
+		ld  C, Y+	;lowest byte of multiplier
+		ld  D, Y+	;middle byte of multiplier
+		ld  E, Y    ;highest byte of multiplier
+		ldi YL, low(MUL24_TEMP)
+		ldi YH, high(MUL24_TEMP)
+		ld A, X+
+		st Y+, A
+		ld A, X+
+		st Y+, A
+		ld A, X+
+		st Y+, A ;we have now copied the multiplier to Y in the temp register and are now able to shift it every time
+MULT24_LOOP:
+		clc
+		ror C
+		brcc SKIP_ADD ;if we don't skip, we gotta add the multiplicand, shifted left by the counter oloop, to Z
+		ldi YL, low(MUL24_TEMP)
+		ldi YH, high(MUL24_TEMP)
+
+		; Load beginning address of result into Z
+		ldi		ZL, low(MUL24_Result)
+		ldi		ZH, high(MUL24_Result)
+		; now we add the value in Y, which is already rotated to the correct value, to Z!
+		clc
+		; we have to add 6 bytes together now!
+		ld A, Z
+		ld B, Y+
+		adc A, B
+		st Z+, A
+		ld A, Z
+		ld B, Y+
+		adc A, B
+		st Z+, A
+		ld A, Z
+		ld B, Y+
+		adc A, B
+		st Z+, A
+		ld A, Z
+		ld B, Y+
+		adc A, B
+		st Z+, A
+		ld A, Z
+		ld B, Y+
+		adc A, B
+		st Z+, A
+		ld A, Z
+		ld B, Y+
+		adc A, B
+		st Z, A
+		; Z now holds the intermediate answer
+SKIP_ADD:
+		clc
+		ror D
+		brcc SKIP_ADD2
+		ori C, (1<<7) ;maintain the bit carried forward through the lower byte
+SKIP_ADD2:
+		clc
+		ror E
+		brcc SKIP_ADD3
+		ori D, (1<<7)
+SKIP_ADD3:
+		; now we need to shift the multiplier left for the next iteration
+		ldi YL, low(MUL24_TEMP)
+		ldi YH, high(MUL24_TEMP)
+		clc
+		; we have to rotate left through carry six times on the temp register storing the multiplier
+		ld A, Y
+		rol A
+		st Y+, A
+		ld A, Y
+		rol A
+		st Y+, A
+		ld A, Y
+		rol A
+		st Y+, A
+		ld A, Y
+		rol A
+		st Y+, A
+		ld A, Y
+		rol A
+		st Y+, A
+		ld A, Y
+		rol A
+		st Y, A
+		; the temp multiplicand has now been appropriately rotated left for the next bit
+		inc oloop
+		cpi oloop, 24
+		brne MULT24_LOOP
+		; for each iteration
+		; if bit at the counter value is 1:
+		; copy the multiplicand into data mem
+		; shift multiplicand left by the counter value
+		; add to the result
 
 		ret						; End a function with RET
 
@@ -374,6 +459,8 @@ MUL24_MULTIPLICAND:
 		.byte 3
 MUL24_MULTIPLIER:
 		.byte 3
+MUL24_TEMP:
+		.byte 6
 .org	$0160
 MUL24_Result:
 		.byte 6
