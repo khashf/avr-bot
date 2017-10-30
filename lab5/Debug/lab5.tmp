@@ -1,0 +1,53 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.6</VERSION>
+ <DEVICE>"ATmega128"</DEVICE>
+ <WORKING_DIR>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\Debug\lab5.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>lab5.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>lab5.map</FILE>
+  <FILE>lab5.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <INIT><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>48</LINE></INIT>
+  <MAIN><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>62</LINE></MAIN>
+  <ADD16><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>114</LINE></ADD16>
+  <SUB16><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>150</LINE></SUB16>
+  <DONE><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>101</LINE></DONE>
+  <ADD16_OP1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>345</LINE></ADD16_OP1>
+  <ADD16_OP2><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>347</LINE></ADD16_OP2>
+  <ADD16_Result><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>351</LINE></ADD16_Result>
+  <EXIT_ADD><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>142</LINE></EXIT_ADD>
+  <SUB16_OP1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>355</LINE></SUB16_OP1>
+  <SUB16_OP2><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>357</LINE></SUB16_OP2>
+  <SUB16_Result><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>361</LINE></SUB16_Result>
+  <MUL24><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>181</LINE></MUL24>
+  <MUL24_MULTIPLICAND><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>365</LINE></MUL24_MULTIPLICAND>
+  <MUL24_MULTIPLIER><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>367</LINE></MUL24_MULTIPLIER>
+  <MUL24_Result><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>370</LINE></MUL24_Result>
+  <COMPOUND><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>208</LINE></COMPOUND>
+  <MUL16><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>231</LINE></MUL16>
+  <addrB><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>338</LINE></addrB>
+  <LAddrP><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>339</LINE></LAddrP>
+  <MUL16_OLOOP><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>258</LINE></MUL16_OLOOP>
+  <addrA><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>337</LINE></addrA>
+  <MUL16_ILOOP><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>265</LINE></MUL16_ILOOP>
+  <FUNC><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>309</LINE></FUNC>
+  <OperandD><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>324</LINE></OperandD>
+  <OperandE><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>326</LINE></OperandE>
+  <OperandF><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab5\main.asm</FILE><LINE>328</LINE></OperandF>
+ </LABELS>
+</ASSEMBLER_INFO>

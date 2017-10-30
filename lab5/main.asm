@@ -47,7 +47,10 @@
 ;-----------------------------------------------------------
 INIT:							; The initialization routine
 		; Initialize Stack Pointer
-		; TODO					; Init the 2 stack pointer registers
+		ldi		mpr, low(RAMEND)
+		out		SPL, mpr		; Load SPL with low byte of RAMEND
+		ldi		mpr, high(RAMEND)
+		out		SPH, mpr		; Load SPH with high byte of RAMEND
 
 		clr		zero			; Set the zero register to zero, maintain
 								; these semantics, meaning, don't
@@ -66,6 +69,7 @@ MAIN:							; The Main program
 
 				; Call ADD16 function to test its correctness
 				; (calculate A2FF + F477)
+				rcall ADD16
 
 				; Observe result in Memory window
 
@@ -76,6 +80,7 @@ MAIN:							; The Main program
 
 				; Call SUB16 function to test its correctness
 				; (calculate F08A - 4BCD)
+				rcall SUB16
 
 				; Observe result in Memory window
 
@@ -112,11 +117,29 @@ ADD16:
 		ldi		XH, high(ADD16_OP1)	; Load high byte of address
 
 		; Load beginning address of second operand into Y
+		ldi		YL, low(ADD16_OP2)	; Load low byte of address
+		ldi		YH, high(ADD16_OP2) ; Load high byte of address
 
 		; Load beginning address of result into Z
+		ldi		ZL, low(ADD16_Result)
+		ldi		ZH, high(ADD16_Result)
 
 		; Execute the function
-		
+		ld		A, X+				; A = M[A], X++
+		ld		B, Y+				; A = M[B], Y++
+		add		B, A				; B = B + A
+		st		Z+, B				; M[Z] = B, Z++
+
+		ld		A, X+				; A = M[A], X++
+		ld		B, Y+				; A = M[B], Y++
+		adc		B, A				; B = B + A + C
+		st		Z+, B				; M[Z] = B, Z++
+
+		brcc	EXIT_ADD
+		ldi		XL, $01
+		st		Z, XL		
+
+EXIT_ADD:		
 		ret						; End a function with RET
 
 ;-----------------------------------------------------------
@@ -125,9 +148,29 @@ ADD16:
 ;		result.
 ;-----------------------------------------------------------
 SUB16:
-		; Execute the function here
-		
+		; Load beginning address of first operand into X
+		ldi		XL, low(SUB16_OP1)	; Load low byte of address
+		ldi		XH, high(SUB16_OP1)	; Load high byte of address
 
+		; Load beginning address of second operand into Y
+		ldi		YL, low(SUB16_OP2)	; Load low byte of address
+		ldi		YH, high(SUB16_OP2) ; Load high byte of address
+
+		; Load beginning address of result into Z
+		ldi		ZL, low(SUB16_Result)
+		ldi		ZH, high(SUB16_Result)
+
+		; Execute the function
+		ld		A, X+				; A = M[A], X++
+		ld		B, Y+				; A = M[B], Y++
+		sub		A, B				; A = A - B
+		st		Z+, A				; M[Z] = A, Z++
+
+		ld		A, X+				; A = M[A], X++
+		ld		B, Y+				; A = M[B], Y++
+		sbc		A, B				; A = A - B - C
+		st		Z+, A				; M[Z] = A, Z++
+	
 		ret						; End a function with RET
 
 ;-----------------------------------------------------------
@@ -136,8 +179,27 @@ SUB16:
 ;		result.
 ;-----------------------------------------------------------
 MUL24:
-		; Execute the function here
+		; Load beginning address of first operand into X
+		ldi		XL, low(MUL24_MULTIPLICAND)	; Load low byte of address
+		ldi		XH, high(MUL24_MULTIPLICAND)	; Load high byte of address
+
+		; Load beginning address of second operand into Y
+		ldi		YL, low(MUL24_MULTIPLIER)	; Load low byte of address
+		ldi		YH, high(MUL24_MULTIPLIER) ; Load high byte of address
 		
+		; Load beginning address of result into Z
+		ldi		ZL, low(MUL24_Result)
+		ldi		ZH, high(MUL24_Result)
+		
+		; store the bit string we want to go over into data mem
+		; use X register to iterate through it
+		; we have a counter for each interation, we increment counter until reach 24
+		
+			; for each iteration
+			; if bit at the counter value is 1:
+				; copy the multiplicand into data mem
+				; shift multiplicand left by the counter value
+				; add to the result
 
 		ret						; End a function with RET
 
@@ -296,6 +358,25 @@ ADD16_OP2:
 .org	$0120				; data memory allocation for results
 ADD16_Result:
 		.byte 3				; allocate three bytes for ADD16 result
+
+		.org	$0130				; data memory allocation for operands
+SUB16_OP1:
+		.byte 2				; allocate two bytes for first operand of ADD16
+SUB16_OP2:
+		.byte 2				; allocate two bytes for second operand of ADD16
+
+.org	$0140				; data memory allocation for results
+SUB16_Result:
+		.byte 3				; allocate three bytes for ADD16 result
+
+.org	$0150
+MUL24_MULTIPLICAND:
+		.byte 3
+MUL24_MULTIPLIER:
+		.byte 3
+.org	$0160
+MUL24_Result:
+		.byte 6
 
 ;***********************************************************
 ;*	Additional Program Includes
