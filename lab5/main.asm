@@ -97,7 +97,7 @@ MAIN:							; The Main program
 				; Observe result in Memory window
 
 		; Call the COMPOUND function
-
+				rcall COMPOUND
 				; Observe final result in Memory window
 
 DONE:	rjmp	DONE			; Create an infinite while loop to signify the 
@@ -217,30 +217,14 @@ MULT24_LOOP:
 		; now we add the value in Y, which is already rotated to the correct value, to Z!
 		clc
 		; we have to add 6 bytes together now!
+		ldi iloop, 6
+ADD_6BYTES:
 		ld A, Z
 		ld B, Y+
 		adc A, B
 		st Z+, A
-		ld A, Z
-		ld B, Y+
-		adc A, B
-		st Z+, A
-		ld A, Z
-		ld B, Y+
-		adc A, B
-		st Z+, A
-		ld A, Z
-		ld B, Y+
-		adc A, B
-		st Z+, A
-		ld A, Z
-		ld B, Y+
-		adc A, B
-		st Z+, A
-		ld A, Z
-		ld B, Y+
-		adc A, B
-		st Z, A
+		dec iloop
+		brne ADD_6BYTES
 		; Z now holds the intermediate answer
 SKIP_ADD:
 		clc
@@ -258,24 +242,13 @@ SKIP_ADD3:
 		ldi YH, high(MUL24_TEMP)
 		clc
 		; we have to rotate left through carry six times on the temp register storing the multiplier
+		ldi iloop, 6
+ROTATE6:
 		ld A, Y
 		rol A
 		st Y+, A
-		ld A, Y
-		rol A
-		st Y+, A
-		ld A, Y
-		rol A
-		st Y+, A
-		ld A, Y
-		rol A
-		st Y+, A
-		ld A, Y
-		rol A
-		st Y+, A
-		ld A, Y
-		rol A
-		st Y, A
+		dec iloop
+		brne ROTATE6
 		; the temp multiplicand has now been appropriately rotated left for the next bit
 		inc oloop
 		cpi oloop, 24
@@ -299,16 +272,104 @@ SKIP_ADD3:
 ;		All result bytes should be cleared before beginning.
 ;-----------------------------------------------------------
 COMPOUND:
-
+		; clear all result bytes
+		ldi		mpr, 0
+		mov		A, mpr
+		ldi	    XL, low(SUB16_Result)
+		ldi		XH, high(SUB16_Result)
+		st		X+, A
+		st		X, A
+		ldi	    XL, low(ADD16_Result)
+		ldi		XH, high(ADD16_Result)
+		st		X+, A
+		st		X+, A
+		st		X, A
+		ldi	    XL, low(MUL24_Result)
+		ldi		XH, high(MUL24_Result)
+		st		X+, A
+		st		X+, A
+		st		X+, A
+		st		X+, A
+		st		X+, A
+		st		X+, A
+		ldi	    XL, low(MUL24_Temp)
+		ldi		XH, high(MUL24_Temp)
+		st		X+, A
+		st		X+, A
+		st		X+, A
+		st		X+, A
+		st		X+, A
+		st		X+, A
 		; Setup SUB16 with operands D and E
 		; Perform subtraction to calculate D - E
+		ldi		XL, low(SUB16_OP1)  ;
+		ldi		XH, high(SUB16_OP1)	;
+
+		ldi		ZL, low(OperandD<<1)  ;
+		ldi		ZH, high(OperandD<<1)  ;
+
+		lpm		A, Z+
+		st		X+, A
+		lpm		A, Z
+		st		X, A
+		; SUB16_OP1 now contains OperandD
+		ldi		XL, low(SUB16_OP2)  ;
+		ldi		XH, high(SUB16_OP2)	;
+
+		ldi		ZL, low(OperandE<<1)  ;
+		ldi		ZH, high(OperandE<<1)  ;
+
+		lpm		A, Z+
+		st		X+, A
+		lpm		A, Z
+		st		X, A
+		; SUB16_OP2 now contains OperandE
+		rcall	SUB16
+		ldi		XL, low(ADD16_OP1)  ;
+		ldi		XH, high(ADD16_OP1)	;
+
+		ldi		ZL, low(OperandF<<1)  ;
+		ldi		ZH, high(OperandF<<1)  ;
+
+		lpm		A, Z+
+		st		X+, A
+		lpm		A, Z
+		st		X, A
+		; ADD16_OP1 now contains OperandD
+		ldi		XL, low(ADD16_OP2)  ;
+		ldi		XH, high(ADD16_OP2) ;
 		
-		; Setup the ADD16 function with SUB16 result and operand F
-		; Perform addition next to calculate (D - E) + F
+		ldi		YL, low(SUB16_Result) ;
+		ldi		YH, high(SUB16_Result) ;
 
+		ld		A, Y+
+		st		X+, A
+		ld		A, Y
+		st		X, A
+		; ADD16_OP2 now contains D-E
+		rcall ADD16
+		; ADD16_Result now contains (D-E)+F
 		; Setup the MUL24 function with ADD16 result as both operands
-		; Perform multiplication to calculate ((D - E) + F)^2
+		ldi		XL, low(ADD16_Result)
+		ldi		XH, high(ADD16_Result)
 
+		ldi		YL, low(MUL24_MULTIPLICAND)
+		ldi		YH, high(MUL24_MULTIPLICAND)
+
+		ldi		ZL, low(MUL24_MULTIPLIER)
+		ldi		ZH, high(MUL24_MULTIPLIER)
+
+		ld A, X+
+		st Y+, A
+		st Z+, A
+		ld A, X+
+		st Y+, A
+		st Z+, A
+		ld A, X
+		st Y, A
+		st Z, A
+		; Perform multiplication to calculate ((D - E) + F)^2
+		rcall MUL24
 		ret						; End a function with RET
 
 ;-----------------------------------------------------------
