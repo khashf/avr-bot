@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab1\bump_bot_mod.asm Mon Oct 23 13:28:23 2017
+AVRASM ver. 2.2.6  D:\win_dev\avr-bot\lab1\bump_bot_mod.asm Wed Nov 01 18:50:25 2017
 
 
 EQU  SIGNATURE_000 0000001e

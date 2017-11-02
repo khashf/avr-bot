@@ -1,0 +1,34 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.6</VERSION>
+ <DEVICE>"ATmega128"</DEVICE>
+ <WORKING_DIR>D:\win_dev\avr-bot\lab6\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>D:\win_dev\avr-bot\lab6\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>D:\win_dev\avr-bot\lab6\Debug\lab6.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>lab6.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>lab6.map</FILE>
+  <FILE>lab6.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <INIT><FILE>D:\win_dev\avr-bot\lab6\main.asm</FILE><LINE>72</LINE></INIT>
+  <HitRight><FILE>D:\win_dev\avr-bot\lab6\main.asm</FILE><LINE>126</LINE></HitRight>
+  <HitLeft><FILE>D:\win_dev\avr-bot\lab6\main.asm</FILE><LINE>167</LINE></HitLeft>
+  <MAIN><FILE>D:\win_dev\avr-bot\lab6\main.asm</FILE><LINE>105</LINE></MAIN>
+  <Wait><FILE>D:\win_dev\avr-bot\lab6\main.asm</FILE><LINE>203</LINE></Wait>
+  <Loop><FILE>D:\win_dev\avr-bot\lab6\main.asm</FILE><LINE>208</LINE></Loop>
+  <OLoop><FILE>D:\win_dev\avr-bot\lab6\main.asm</FILE><LINE>209</LINE></OLoop>
+  <ILoop><FILE>D:\win_dev\avr-bot\lab6\main.asm</FILE><LINE>210</LINE></ILoop>
+ </LABELS>
+</ASSEMBLER_INFO>

@@ -1,19 +1,19 @@
 <ASSEMBLER_INFO>
  <VERSION>2.2.6</VERSION>
  <DEVICE>"ATmega128"</DEVICE>
- <WORKING_DIR>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\Debug</WORKING_DIR>
+ <WORKING_DIR>D:\win_dev\avr-bot\lab4\Debug</WORKING_DIR>
  <INCLUDE_PATH>
   <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc</DIR>
   <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
   <DIR></DIR>
  </INCLUDE_PATH>
- <SOURCE_FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\main.asm</SOURCE_FILE>
+ <SOURCE_FILE>D:\win_dev\avr-bot\lab4\main.asm</SOURCE_FILE>
  <INCLUDED_FILES>
   <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc</FILE>
-  <FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE>
+  <FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE>
  </INCLUDED_FILES>
  <OBJECT_FILES>
-  <FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\Debug\lab4.obj</FILE>
+  <FILE>D:\win_dev\avr-bot\lab4\Debug\lab4.obj</FILE>
  </OBJECT_FILES>
  <HEX_FILES>
   <FILE>lab4.hex</FILE>
@@ -23,47 +23,47 @@
   <FILE>lab4.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <INIT><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\main.asm</FILE><LINE>49</LINE></INIT>
-  <LCDInit><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>75</LINE></LCDInit>
-  <STRING_BEG><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\main.asm</FILE><LINE>183</LINE></STRING_BEG>
-  <STRING_END><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\main.asm</FILE><LINE>186</LINE></STRING_END>
-  <LOOP><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\main.asm</FILE><LINE>92</LINE></LOOP>
-  <LCDWrite><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>170</LINE></LCDWrite>
-  <DONE1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\main.asm</FILE><LINE>140</LINE></DONE1>
-  <SCROLL><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\main.asm</FILE><LINE>116</LINE></SCROLL>
-  <SCROLLLOOP><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\main.asm</FILE><LINE>120</LINE></SCROLLLOOP>
-  <SECONDCHECK><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\main.asm</FILE><LINE>129</LINE></SECONDCHECK>
-  <LASTCHAR><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\main.asm</FILE><LINE>134</LINE></LASTCHAR>
-  <MAIN><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\main.asm</FILE><LINE>148</LINE></MAIN>
-  <FUNC><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\main.asm</FILE><LINE>165</LINE></FUNC>
-  <LCDINIT_L1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>139</LINE></LCDINIT_L1>
-  <LCDWait><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>492</LINE></LCDWait>
-  <LCDWriteCmd><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>436</LINE></LCDWriteCmd>
-  <LCDClr><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>230</LINE></LCDClr>
-  <LCDWrLn1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>180</LINE></LCDWrLn1>
-  <LCDWrLn2><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>205</LINE></LCDWrLn2>
-  <LCDSetLine><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>388</LINE></LCDSetLine>
-  <LCDWriteLine><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>423</LINE></LCDWriteLine>
-  <LCDClrLn1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>240</LINE></LCDClrLn1>
-  <LCDClrLn2><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>265</LINE></LCDClrLn2>
-  <LCDClrLine><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>404</LINE></LCDClrLine>
-  <LCDWriteByte><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>302</LINE></LCDWriteByte>
-  <LCDWriteByte_3><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>323</LINE></LCDWriteByte_3>
-  <LCDWriteByte_1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>313</LINE></LCDWriteByte_1>
-  <LCDWriteByte_2><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>318</LINE></LCDWriteByte_2>
-  <LCDWriteChar><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>457</LINE></LCDWriteChar>
-  <Bin2ASCII><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>339</LINE></Bin2ASCII>
-  <B2A_1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>352</LINE></B2A_1>
-  <B2A_3><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>360</LINE></B2A_3>
-  <B2A_2><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>357</LINE></B2A_2>
-  <div10><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>515</LINE></div10>
-  <LCDClrLine_1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>407</LINE></LCDClrLine_1>
-  <LCDWriteLine_1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>425</LINE></LCDWriteLine_1>
-  <LCDWriteData><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>472</LINE></LCDWriteData>
-  <LCDWC_L1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>443</LINE></LCDWC_L1>
-  <LCDW_L1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>493</LINE></LCDW_L1>
-  <LCDW_L2><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>494</LINE></LCDW_L2>
-  <div10_1><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>554</LINE></div10_1>
-  <div10_2><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab4\LCDDriver.asm</FILE><LINE>560</LINE></div10_2>
+  <INIT><FILE>D:\win_dev\avr-bot\lab4\main.asm</FILE><LINE>49</LINE></INIT>
+  <LCDInit><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>75</LINE></LCDInit>
+  <STRING_BEG><FILE>D:\win_dev\avr-bot\lab4\main.asm</FILE><LINE>183</LINE></STRING_BEG>
+  <STRING_END><FILE>D:\win_dev\avr-bot\lab4\main.asm</FILE><LINE>186</LINE></STRING_END>
+  <LOOP><FILE>D:\win_dev\avr-bot\lab4\main.asm</FILE><LINE>92</LINE></LOOP>
+  <LCDWrite><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>170</LINE></LCDWrite>
+  <DONE1><FILE>D:\win_dev\avr-bot\lab4\main.asm</FILE><LINE>140</LINE></DONE1>
+  <SCROLL><FILE>D:\win_dev\avr-bot\lab4\main.asm</FILE><LINE>116</LINE></SCROLL>
+  <SCROLLLOOP><FILE>D:\win_dev\avr-bot\lab4\main.asm</FILE><LINE>120</LINE></SCROLLLOOP>
+  <SECONDCHECK><FILE>D:\win_dev\avr-bot\lab4\main.asm</FILE><LINE>129</LINE></SECONDCHECK>
+  <LASTCHAR><FILE>D:\win_dev\avr-bot\lab4\main.asm</FILE><LINE>134</LINE></LASTCHAR>
+  <MAIN><FILE>D:\win_dev\avr-bot\lab4\main.asm</FILE><LINE>148</LINE></MAIN>
+  <FUNC><FILE>D:\win_dev\avr-bot\lab4\main.asm</FILE><LINE>165</LINE></FUNC>
+  <LCDINIT_L1><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>139</LINE></LCDINIT_L1>
+  <LCDWait><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>492</LINE></LCDWait>
+  <LCDWriteCmd><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>436</LINE></LCDWriteCmd>
+  <LCDClr><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>230</LINE></LCDClr>
+  <LCDWrLn1><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>180</LINE></LCDWrLn1>
+  <LCDWrLn2><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>205</LINE></LCDWrLn2>
+  <LCDSetLine><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>388</LINE></LCDSetLine>
+  <LCDWriteLine><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>423</LINE></LCDWriteLine>
+  <LCDClrLn1><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>240</LINE></LCDClrLn1>
+  <LCDClrLn2><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>265</LINE></LCDClrLn2>
+  <LCDClrLine><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>404</LINE></LCDClrLine>
+  <LCDWriteByte><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>302</LINE></LCDWriteByte>
+  <LCDWriteByte_3><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>323</LINE></LCDWriteByte_3>
+  <LCDWriteByte_1><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>313</LINE></LCDWriteByte_1>
+  <LCDWriteByte_2><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>318</LINE></LCDWriteByte_2>
+  <LCDWriteChar><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>457</LINE></LCDWriteChar>
+  <Bin2ASCII><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>339</LINE></Bin2ASCII>
+  <B2A_1><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>352</LINE></B2A_1>
+  <B2A_3><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>360</LINE></B2A_3>
+  <B2A_2><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>357</LINE></B2A_2>
+  <div10><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>515</LINE></div10>
+  <LCDClrLine_1><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>407</LINE></LCDClrLine_1>
+  <LCDWriteLine_1><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>425</LINE></LCDWriteLine_1>
+  <LCDWriteData><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>472</LINE></LCDWriteData>
+  <LCDWC_L1><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>443</LINE></LCDWC_L1>
+  <LCDW_L1><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>493</LINE></LCDW_L1>
+  <LCDW_L2><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>494</LINE></LCDW_L2>
+  <div10_1><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>554</LINE></div10_1>
+  <div10_2><FILE>D:\win_dev\avr-bot\lab4\LCDDriver.asm</FILE><LINE>560</LINE></div10_2>
  </LABELS>
 </ASSEMBLER_INFO>

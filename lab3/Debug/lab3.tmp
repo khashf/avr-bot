@@ -1,18 +1,18 @@
 <ASSEMBLER_INFO>
  <VERSION>2.2.6</VERSION>
  <DEVICE>"ATmega128"</DEVICE>
- <WORKING_DIR>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab3\Debug</WORKING_DIR>
+ <WORKING_DIR>D:\win_dev\avr-bot\lab3\Debug</WORKING_DIR>
  <INCLUDE_PATH>
   <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc</DIR>
   <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
   <DIR></DIR>
  </INCLUDE_PATH>
- <SOURCE_FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab3\main.asm</SOURCE_FILE>
+ <SOURCE_FILE>D:\win_dev\avr-bot\lab3\main.asm</SOURCE_FILE>
  <INCLUDED_FILES>
   <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc</FILE>
  </INCLUDED_FILES>
  <OBJECT_FILES>
-  <FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab3\Debug\lab3.obj</FILE>
+  <FILE>D:\win_dev\avr-bot\lab3\Debug\lab3.obj</FILE>
  </OBJECT_FILES>
  <HEX_FILES>
   <FILE>lab3.hex</FILE>
@@ -22,12 +22,12 @@
   <FILE>lab3.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <INIT><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab3\main.asm</FILE><LINE>46</LINE></INIT>
-  <MAIN><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab3\main.asm</FILE><LINE>55</LINE></MAIN>
-  <LOOP><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab3\main.asm</FILE><LINE>62</LINE></LOOP>
-  <LOOP2><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab3\main.asm</FILE><LINE>71</LINE></LOOP2>
-  <FUNCTION><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab3\main.asm</FILE><LINE>101</LINE></FUNCTION>
-  <DONE><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab3\main.asm</FILE><LINE>91</LINE></DONE>
-  <EXIT><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\My Documents\avr\avr-bot\lab3\main.asm</FILE><LINE>118</LINE></EXIT>
+  <INIT><FILE>D:\win_dev\avr-bot\lab3\main.asm</FILE><LINE>46</LINE></INIT>
+  <MAIN><FILE>D:\win_dev\avr-bot\lab3\main.asm</FILE><LINE>55</LINE></MAIN>
+  <LOOP><FILE>D:\win_dev\avr-bot\lab3\main.asm</FILE><LINE>62</LINE></LOOP>
+  <LOOP2><FILE>D:\win_dev\avr-bot\lab3\main.asm</FILE><LINE>71</LINE></LOOP2>
+  <FUNCTION><FILE>D:\win_dev\avr-bot\lab3\main.asm</FILE><LINE>101</LINE></FUNCTION>
+  <DONE><FILE>D:\win_dev\avr-bot\lab3\main.asm</FILE><LINE>91</LINE></DONE>
+  <EXIT><FILE>D:\win_dev\avr-bot\lab3\main.asm</FILE><LINE>118</LINE></EXIT>
  </LABELS>
 </ASSEMBLER_INFO>
