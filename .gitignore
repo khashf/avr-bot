@@ -1,0 +1,19 @@
+# file extensions
+*.[oa]
+*.DS_Store
+*.atsln
+*.suo
+*.cproj
+*.user
+*.xml
+*.asmproj
+*.tmp
+*.obj
+*.lss
+*.map
+*.hex
+
+# subdirectories
+.vs/
+[Dd]ebug/
+[Rr]elease/
