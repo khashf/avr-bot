@@ -42,10 +42,11 @@
 .equ	EngDirR = 5				; Right Engine Direction Bit
 .equ	EngDirL = 6				; Left Engine Direction Bit
 
-.equ	WasHitLeft = 0			; 
-.equ	WasHitRight = 1			;
-.equ	WasNeither = 2			;
-.equ	WasFirstTime = 3		;
+.equ	WasHitLeft = 0			; The last time was a left hit 
+.equ	WasHitRight = 1			; The last hit was a right hit
+.equ	WasNeither = 2			; The last hit was neither right nor left hit
+								; (can be the first time the bot startup,
+								; or after the bot just turned around
 
 ;/////////////////////////////////////////////////////////////
 ;These macros are the values to make the TekBot Move.
@@ -68,20 +69,14 @@
 .org	$0000					; Beginning of IVs
 		rjmp 	INIT			; Reset interrupt
 
-		; Set up interrupt vectors for any interrupts being used
+; Set up interrupt vectors for any interrupts being used
 .org $0002
 		rjmp	HitRight
 		reti
 .org $0004
 		rjmp	HitLeft
 		reti
-		; This is just an example:
-;.org	$002E					; Analog Comparator IV
-;		rcall	HandleAC		; Call function to handle interrupt
-;		reti					; Return from interrupt
-
-
-.org	$0046					; End of Interrupt Vectors
+.org $0046					
 
 ;***********************************************************
 ;*	Program Initialization
@@ -106,8 +101,8 @@ INIT:							; The initialization routine
 		ldi		mpr, MovFwd						; Load Move Forward Command
 		out		PORTB, mpr						; Send command to motors
 	; Initialize Flags
-		ldi		nHits, 0		; number of hits
-		ldi		hitSide, WasFirstTime
+		ldi		nHits, 0						; 
+		ldi		hitSide, WasNeither
 	; Initialize external interrupts
 		; Set the Interrupt Sense Control to falling edge
 		ldi		mpr, (1<<ISC01)|(0<<ISC00)|(1<<ISC11)|(0<<ISC10)
@@ -116,14 +111,13 @@ INIT:							; The initialization routine
 		ldi		mpr, (1<<INT0|1<<INT1)
 		out		EIMSK, mpr
 		; Turn on interrupts
-		; NOTE: This must be the last thing to do in the INIT function
 		sei
 
 
 ;***********************************************************
 ;*	Main Program
 ;***********************************************************
-MAIN:							; The Main program
+MAIN:							 
 		ldi		mpr, MovFwd		; the bot always move forward by default when not turning
 		out		PORTB, mpr		; 
 
@@ -135,9 +129,9 @@ MAIN:							; The Main program
 ;***********************************************************
 
 ;-----------------------------------------------------------
-; Func: Template function header
-; Desc: Cut and paste this and fill in the info at the 
-;		beginning of your functions
+; Func: HitRight()
+; Desc: React when the right whisker is hit
+;		
 ;-----------------------------------------------------------
 HitRight:							; Begin a function with a label
 		
@@ -160,13 +154,13 @@ HitRight:							; Begin a function with a label
 		rcall	Wait
 
 		; If (this's an alternating turn or is the first time)
-		cpi		hitSide, WasFirstTime
+		cpi		hitSide, WasNeither
 		breq	CountAltTurnRight	; count hit
 		cpi		hitSide, WasHitLeft
 		breq	CountAltTurnRight	; count hit
 		; Else (same side)
-		ldi		nHits, 0			; loose the streak => lose streak
-		rjmp	SetTurnLeftTime			; set up time to turn left
+		ldi		nHits, 1			; lose the streak => lose streak
+		rjmp	SetTurnLeftTime		; set up time to turn left
 
 CountAltTurnRight:
 		inc		nHits				; count up this hit
@@ -210,9 +204,9 @@ TurnLeft:
 		ret					; End a function with RET
 
 ;-----------------------------------------------------------
-; Func: Template function header
-; Desc: Cut and paste this and fill in the info at the 
-;		beginning of your functions
+; Func: HitLeft(void)
+; Desc: React when the left whisker is hit
+;		
 ;-----------------------------------------------------------
 HitLeft:	
 		/*push	mpr			; Save mpr register
@@ -234,12 +228,12 @@ HitLeft:
 		rcall	Wait
 
 		; If (this's an alternating turn)
-		cpi		hitSide, WasFirstTime
+		cpi		hitSide, WasNeither
 		breq	CountAltTurnLeft	; count hit
 		cpi		hitSide, WasHitRight
 		breq	CountAltTurnLeft	; count hit
 		; Else
-		ldi		nHits, 0			; reset nHits = 0 => loose the streak
+		ldi		nHits, 1			; reset nHits = 0 => lose the streak
 		rjmp	SetTurnRightTime			; set up time to turn left
 
 CountAltTurnLeft:
@@ -284,9 +278,9 @@ TurnRight:
 		ret					; End a function with RET
 
 ;-----------------------------------------------------------
-; Func: Template function header
-; Desc: Cut and paste this and fill in the info at the 
-;		beginning of your functions
+; Func: Wait(waitcnt)
+; Desc: Wait an amount of 10*<waitcnt> miliseconds
+;		
 ;-----------------------------------------------------------
 Wait:
 		push	waitcnt			; Save wait register
@@ -311,9 +305,8 @@ ILoop:	dec		ilcnt			; decrement ilcnt
 ;*	Stored Program Data
 ;***********************************************************
 
-; Enter any stored data you might need here
+
 
 ;***********************************************************
 ;*	Additional Program Includes
 ;***********************************************************
-; There are no additional file includes for this program
