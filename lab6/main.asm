@@ -16,8 +16,9 @@
 .include "m128def.inc"			; Include definition file
 
 ;***********************************************************
-;*	Internal Register Definitions and Constants
+;*	Internal Register Definitions
 ;***********************************************************
+
 .def	mpr = r16				; Multipurpose register 
 .def	waitcnt = r17			; Wait Loop Counter
 .def	ilcnt = r18				; Inner Loop Counter
@@ -26,9 +27,12 @@
 .def	nHits = r20				; Number of continual alternative whisker hits
 .def	hitSide = r21			; flag indicating bot was hit left the last time
 
-.equ	ReverseTime = 100				; Time to keep the bot waiting in the wait loop
-.equ	TurnLeftTime = 20		; Time to keep the bot turning for 1 secs to turn left
-.equ	TurnRightTime = 20		; Time to keep the bot turning for 1 secs to turn right
+;***********************************************************
+;*	Constants
+;***********************************************************
+.equ	ReverseTime = 50		; Time to keep the bot waiting in the wait loop
+.equ	TurnLeftTime = 50		; Time to keep the bot turning for 1 secs to turn left
+.equ	TurnRightTime = 50		; Time to keep the bot turning for 1 secs to turn right
 .equ	TurnAroundTime = 200	; Time to keep the bot turning for 3 secs to turn around
 
 .equ	WskrR = 0				; Right Whisker Input Bit
@@ -40,7 +44,8 @@
 
 .equ	WasHitLeft = 0			; 
 .equ	WasHitRight = 1			;
-.equ	WasNeither = 2
+.equ	WasNeither = 2			;
+.equ	WasFirstTime = 3		;
 
 ;/////////////////////////////////////////////////////////////
 ;These macros are the values to make the TekBot Move.
@@ -51,6 +56,7 @@
 .equ	TurnR = (1<<EngDirL)			; Turn Right Command
 .equ	TurnL = (1<<EngDirR)			; Turn Left Command
 .equ	Halt = (1<<EngEnR|1<<EngEnL)		; Halt Command
+
 ;***********************************************************
 ;*	Start of Code Segment
 ;***********************************************************
@@ -81,42 +87,43 @@
 ;*	Program Initialization
 ;***********************************************************
 INIT:							; The initialization routine
-		; Initialize Stack Pointer
+	; Initialize Stack Pointer
 		ldi		mpr, low(RAMEND)	; initialize Stack Pointer
 		out		SPL, mpr			
 		ldi		mpr, high(RAMEND)
 		out		SPH, mpr
-		; Initialize Port B for output
+	; Initialize Port B for output
 		ldi		mpr, $FF		; Set Port B Data Direction Register
 		out		DDRB, mpr		; for output
 		ldi		mpr, $00		; Initialize Port B Data Register
 		out		PORTB, mpr		; so all Port B outputs are low	
-		; Initialize Port D for input
+	; Initialize Port D for input
 		ldi		mpr, (0<<WskrL|0<<WskrR)		; Set Port D Data Direction Register
 		out		DDRD, mpr						; for input
 		ldi		mpr, (1<<WskrL|1<<WskrR)		; Initialize Port D Data Register
 		out		PORTD, mpr						; so all Port D inputs are Tri-State
-		; Initialize TekBot Forward Movement
+	; Initialize TekBot Forward Movement
 		ldi		mpr, MovFwd						; Load Move Forward Command
 		out		PORTB, mpr						; Send command to motors
-		; Initialize external interrupts
-			; Set the Interrupt Sense Control to falling edge
+	; Initialize Flags
+		ldi		nHits, 0		; number of hits
+		ldi		hitSide, WasFirstTime
+	; Initialize external interrupts
+		; Set the Interrupt Sense Control to falling edge
 		ldi		mpr, (1<<ISC01)|(0<<ISC00)|(1<<ISC11)|(0<<ISC10)
 		sts		EICRA, mpr
 		; Configure the External Interrupt Mask
 		ldi		mpr, (1<<INT0|1<<INT1)
 		out		EIMSK, mpr
 		; Turn on interrupts
+		; NOTE: This must be the last thing to do in the INIT function
 		sei
-			; NOTE: This must be the last thing to do in the INIT function
+
 
 ;***********************************************************
 ;*	Main Program
 ;***********************************************************
 MAIN:							; The Main program
-		ldi		nHits, 0		; number of hits
-		ldi		hitSide, WasNeither
-
 		ldi		mpr, MovFwd		; the bot always move forward by default when not turning
 		out		PORTB, mpr		; 
 
@@ -128,17 +135,17 @@ MAIN:							; The Main program
 ;***********************************************************
 
 ;-----------------------------------------------------------
-;	You will probably want several functions, one to handle the 
-;	left whisker interrupt, one to handle the right whisker 
-;	interrupt, and maybe a wait function
-;------------------------------------------------------------
-
-;-----------------------------------------------------------
 ; Func: Template function header
 ; Desc: Cut and paste this and fill in the info at the 
 ;		beginning of your functions
 ;-----------------------------------------------------------
 HitRight:							; Begin a function with a label
+		
+		/*push	mpr			; Save mpr register
+		push	waitcnt		; Save wait register
+		in		mpr, SREG	; Save program state
+		push	mpr			;*/
+		
 		; Clear interrupt and disable interrupts
 		cli
 		ldi		mpr, (0<<INT0|0<<INT1)
@@ -150,13 +157,15 @@ HitRight:							; Begin a function with a label
 
 		; Wait <waitcnt> secs
 		ldi		waitcnt, ReverseTime
-		rcall Wait
+		rcall	Wait
 
-		; If (this's an alternating turn)
+		; If (this's an alternating turn or is the first time)
+		cpi		hitSide, WasFirstTime
+		breq	CountAltTurnRight	; count hit
 		cpi		hitSide, WasHitLeft
 		breq	CountAltTurnRight	; count hit
-		; Else
-		ldi		nHits, 0			; reset nHits = 0 => loose the streak
+		; Else (same side)
+		ldi		nHits, 0			; loose the streak => lose streak
 		rjmp	SetTurnLeftTime			; set up time to turn left
 
 CountAltTurnRight:
@@ -168,7 +177,7 @@ CountAltTurnRight:
 		rjmp	SetTurnLeftTime
 		
 SetTurnAroundTimeInLeft:
-		ldi		nHits, 0			; reset nHits = 0 
+		ldi		nHits, 0			; reset nHits to 0 
 		ldi		waitcnt, TurnAroundTime
 		ldi		hitSide, WasNeither
 		rjmp	TurnLeft
@@ -193,6 +202,11 @@ TurnLeft:
 		out		EIFR, mpr
 		sei
 
+		/*pop		mpr		; Restore program state
+		out		SREG, mpr	;
+		pop		waitcnt		; Restore wait register
+		pop		mpr		; Restore mpr*/
+
 		ret					; End a function with RET
 
 ;-----------------------------------------------------------
@@ -201,6 +215,11 @@ TurnLeft:
 ;		beginning of your functions
 ;-----------------------------------------------------------
 HitLeft:	
+		/*push	mpr			; Save mpr register
+		push	waitcnt			; Save wait register
+		in		mpr, SREG	; Save program state
+		push	mpr			;*/
+
 		; Clear interrupt and disable interrupts
 		cli
 		ldi		mpr, (0<<INT0|0<<INT1)
@@ -215,6 +234,8 @@ HitLeft:
 		rcall	Wait
 
 		; If (this's an alternating turn)
+		cpi		hitSide, WasFirstTime
+		breq	CountAltTurnLeft	; count hit
 		cpi		hitSide, WasHitRight
 		breq	CountAltTurnLeft	; count hit
 		; Else
@@ -255,8 +276,18 @@ TurnRight:
 		out		EIFR, mpr
 		sei
 
+		/*pop		mpr		; Restore program state
+		out		SREG, mpr	;
+		pop		waitcnt		; Restore wait register
+		pop		mpr		; Restore mpr*/
+
 		ret					; End a function with RET
 
+;-----------------------------------------------------------
+; Func: Template function header
+; Desc: Cut and paste this and fill in the info at the 
+;		beginning of your functions
+;-----------------------------------------------------------
 Wait:
 		push	waitcnt			; Save wait register
 		push	ilcnt			; Save ilcnt register
