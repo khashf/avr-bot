@@ -45,7 +45,6 @@
 .equ	WasHitLeft = 0			; 
 .equ	WasHitRight = 1			;
 .equ	WasNeither = 2			;
-.equ	WasFirstTime = 3		;
 
 ;/////////////////////////////////////////////////////////////
 ;These macros are the values to make the TekBot Move.
@@ -107,7 +106,7 @@ INIT:							; The initialization routine
 		out		PORTB, mpr						; Send command to motors
 	; Initialize Flags
 		ldi		nHits, 0		; number of hits
-		ldi		hitSide, WasFirstTime
+		ldi		hitSide, WasNeither
 	; Initialize external interrupts
 		; Set the Interrupt Sense Control to falling edge
 		ldi		mpr, (1<<ISC01)|(0<<ISC00)|(1<<ISC11)|(0<<ISC10)
@@ -160,12 +159,12 @@ HitRight:							; Begin a function with a label
 		rcall	Wait
 
 		; If (this's an alternating turn or is the first time)
-		cpi		hitSide, WasFirstTime
+		cpi		hitSide, WasNeither
 		breq	CountAltTurnRight	; count hit
 		cpi		hitSide, WasHitLeft
 		breq	CountAltTurnRight	; count hit
 		; Else (same side)
-		ldi		nHits, 0			; loose the streak => lose streak
+		ldi		nHits, 1			; loose the streak => lose streak
 		rjmp	SetTurnLeftTime			; set up time to turn left
 
 CountAltTurnRight:
@@ -234,12 +233,12 @@ HitLeft:
 		rcall	Wait
 
 		; If (this's an alternating turn)
-		cpi		hitSide, WasFirstTime
+		cpi		hitSide, WasNeither
 		breq	CountAltTurnLeft	; count hit
 		cpi		hitSide, WasHitRight
 		breq	CountAltTurnLeft	; count hit
 		; Else
-		ldi		nHits, 0			; reset nHits = 0 => loose the streak
+		ldi		nHits, 1			; reset nHits = 0 => lose the streak
 		rjmp	SetTurnRightTime			; set up time to turn left
 
 CountAltTurnLeft:
