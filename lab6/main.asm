@@ -19,17 +19,28 @@
 ;*	Internal Register Definitions and Constants
 ;***********************************************************
 .def	mpr = r16				; Multipurpose register 
-.def	waitcnt = r17				; Wait Loop Counter
+.def	waitcnt = r17			; Wait Loop Counter
 .def	ilcnt = r18				; Inner Loop Counter
 .def	olcnt = r19				; Outer Loop Counter
 
-.equ	WTime = 100				; Time to wait in wait loop
+.def	nHits = r20				; Number of continual alternative whisker hits
+.def	hitSide = r21			; flag indicating bot was hit left the last time
+
+.equ	ReverseTime = 100				; Time to keep the bot waiting in the wait loop
+.equ	TurnLeftTime = 20		; Time to keep the bot turning for 1 secs to turn left
+.equ	TurnRightTime = 20		; Time to keep the bot turning for 1 secs to turn right
+.equ	TurnAroundTime = 200	; Time to keep the bot turning for 3 secs to turn around
+
 .equ	WskrR = 0				; Right Whisker Input Bit
 .equ	WskrL = 1				; Left Whisker Input Bit
 .equ	EngEnR = 4				; Right Engine Enable Bit
 .equ	EngEnL = 7				; Left Engine Enable Bit
 .equ	EngDirR = 5				; Right Engine Direction Bit
 .equ	EngDirL = 6				; Left Engine Direction Bit
+
+.equ	WasHitLeft = 0			; 
+.equ	WasHitRight = 1			;
+.equ	WasNeither = 2
 
 ;/////////////////////////////////////////////////////////////
 ;These macros are the values to make the TekBot Move.
@@ -103,8 +114,12 @@ INIT:							; The initialization routine
 ;*	Main Program
 ;***********************************************************
 MAIN:							; The Main program
-		ldi		mpr, MovFwd
-		out		PORTB, mpr
+		ldi		nHits, 0		; number of hits
+		ldi		hitSide, WasNeither
+
+		ldi		mpr, MovFwd		; the bot always move forward by default when not turning
+		out		PORTB, mpr		; 
+
 		rjmp	MAIN			; Create an infinite while loop to signify the 
 								; end of the program.
 
@@ -124,81 +139,123 @@ MAIN:							; The Main program
 ;		beginning of your functions
 ;-----------------------------------------------------------
 HitRight:							; Begin a function with a label
+		; Clear interrupt and disable interrupts
 		cli
 		ldi		mpr, (0<<INT0|0<<INT1)
 		out		EIFR, mpr
 
-		push mpr
-		push waitcnt
-		in	mpr, SREG
-		push mpr
-
-		
-
+		; Move back
 		ldi mpr, MovBck
 		out PORTB, mpr
-		ldi waitcnt, WTime
+
+		; Wait <waitcnt> secs
+		ldi		waitcnt, ReverseTime
 		rcall Wait
 
+		; If (this's an alternating turn)
+		cpi		hitSide, WasHitLeft
+		breq	CountAltTurnRight	; count hit
+		; Else
+		ldi		nHits, 0			; reset nHits = 0 => loose the streak
+		rjmp	SetTurnLeftTime			; set up time to turn left
+
+CountAltTurnRight:
+		inc		nHits				; count up this hit
+		; If (this is the 6th alternating hit)
+		cpi		nHits, 6
+		breq	SetTurnAroundTimeInLeft		; set up time to turn around
+		; Else
+		rjmp	SetTurnLeftTime
+		
+SetTurnAroundTimeInLeft:
+		ldi		nHits, 0			; reset nHits = 0 
+		ldi		waitcnt, TurnAroundTime
+		ldi		hitSide, WasNeither
+		rjmp	TurnLeft
+
+SetTurnLeftTime:
+		ldi		waitcnt, TurnLeftTime
+		ldi		hitSide, WasHitRight
+		rjmp	TurnLeft
+
+TurnLeft:
+		; Turn
 		ldi mpr, TurnL
 		out PORTB, mpr
-		ldi waitcnt, WTime
 		rcall Wait
 
-		
-
-		pop mpr
-		out SREG, mpr
-		pop waitcnt
-		pop mpr
+		; Reset input
 		cbi PORTD, WskrL
 		cbi PORTD, WskrR
+
+		; Set interrupt back and start listen for interrupt
 		ldi		mpr, (1<<INT0|1<<INT1)
 		out		EIFR, mpr
 		sei
 
 		ret					; End a function with RET
 
-		;-----------------------------------------------------------
+;-----------------------------------------------------------
 ; Func: Template function header
 ; Desc: Cut and paste this and fill in the info at the 
 ;		beginning of your functions
 ;-----------------------------------------------------------
 HitLeft:	
+		; Clear interrupt and disable interrupts
 		cli
 		ldi		mpr, (0<<INT0|0<<INT1)
 		out		EIFR, mpr
 
+		; Move back
+		ldi		mpr, MovBck
+		out		PORTB, mpr
 
-		push mpr
-		push waitcnt
-		in	mpr, SREG
-		push mpr
+		; Wait <waitcnt> secs
+		ldi		waitcnt, ReverseTime
+		rcall	Wait
 
+		; If (this's an alternating turn)
+		cpi		hitSide, WasHitRight
+		breq	CountAltTurnLeft	; count hit
+		; Else
+		ldi		nHits, 0			; reset nHits = 0 => loose the streak
+		rjmp	SetTurnRightTime			; set up time to turn left
+
+CountAltTurnLeft:
+		inc		nHits				; count up this hit
+		; If (this is the 6th alternating hit)
+		cpi		nHits, 6
+		breq	SetTurnAroundTimeInRight		; set up time to turn around
+		; Else
+		rjmp	SetTurnRightTime
 		
+SetTurnAroundTimeInRight:
+		ldi		nHits, 0			; reset nHits = 0 
+		ldi		waitcnt, TurnAroundTime
+		ldi		hitSide, WasNeither
+		rjmp	TurnRight
 
-		ldi mpr, MovBck
-		out PORTB, mpr
-		ldi waitcnt, WTime
-		rcall Wait
+SetTurnRightTime:
+		ldi		waitcnt, TurnRightTime
+		ldi		hitSide, WasHitLeft
+		rjmp	TurnRight
 
+TurnRight:
+		; Turn
 		ldi mpr, TurnR
 		out PORTB, mpr
-		ldi waitcnt, WTime
 		rcall Wait
 
-		
-
-		pop mpr
-		out SREG, mpr
-		pop waitcnt
-		pop mpr
+		; Reset input
 		cbi PORTD, WskrL
 		cbi PORTD, WskrR
+
+		; Set interrupt back and start listen for interrupt
 		ldi		mpr, (1<<INT0|1<<INT1)
 		out		EIFR, mpr
 		sei
-		ret
+
+		ret					; End a function with RET
 
 Wait:
 		push	waitcnt			; Save wait register
