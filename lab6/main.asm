@@ -30,10 +30,10 @@
 ;***********************************************************
 ;*	Constants
 ;***********************************************************
-.equ	ReverseTime = 50		; Time to keep the bot waiting in the wait loop
-.equ	TurnLeftTime = 50		; Time to keep the bot turning for 1 secs to turn left
-.equ	TurnRightTime = 50		; Time to keep the bot turning for 1 secs to turn right
-.equ	TurnAroundTime = 200	; Time to keep the bot turning for 3 secs to turn around
+.equ	ReverseTime = 100		; Time to keep the bot waiting for .. secs in the wait loop
+.equ	TurnLeftTime = 100		; Time to keep the bot turning for .. secs to turn left
+.equ	TurnRightTime = 100		; Time to keep the bot turning for .. secs to turn right
+.equ	TurnAroundTime = 200	; Time to keep the bot turning for .. secs to turn around
 
 .equ	WskrR = 0				; Right Whisker Input Bit
 .equ	WskrL = 1				; Left Whisker Input Bit
@@ -143,11 +143,12 @@ HitRight:							; Begin a function with a label
 		; Clear interrupt and disable interrupts
 		cli
 		ldi		mpr, (0<<INT0|0<<INT1)
+		out		EIMSK, mpr
 		out		EIFR, mpr
 
 		; Move back
-		ldi mpr, MovBck
-		out PORTB, mpr
+		ldi		mpr, MovBck
+		out		PORTB, mpr
 
 		; Wait <waitcnt> secs
 		ldi		waitcnt, ReverseTime
@@ -193,6 +194,7 @@ TurnLeft:
 
 		; Set interrupt back and start listen for interrupt
 		ldi		mpr, (1<<INT0|1<<INT1)
+		out		EIMSK, mpr
 		out		EIFR, mpr
 		sei
 
@@ -217,6 +219,7 @@ HitLeft:
 		; Clear interrupt and disable interrupts
 		cli
 		ldi		mpr, (0<<INT0|0<<INT1)
+		out		EIMSK, mpr
 		out		EIFR, mpr
 
 		; Move back
@@ -267,6 +270,7 @@ TurnRight:
 
 		; Set interrupt back and start listen for interrupt
 		ldi		mpr, (1<<INT0|1<<INT1)
+		out		EIMSK, mpr
 		out		EIFR, mpr
 		sei
 
