@@ -125,8 +125,7 @@ INIT:
 		out		EIMSK, mpr
 	; Configure 8-bit Timer/Counters, 
 		; no prescaling
-		LDI		A, 0b01101001
-		;LDI	A, 0b01111001
+		LDI	A, 0b01111000 // Try CS00 = 1 or 0
 		OUT		TCCR0, A
 								
 
@@ -176,6 +175,7 @@ INIT:
 ;and is set to 1 when the computer transitions from 0xFF to 0x00.
 
 
+
 ;***********************************************************
 ;*	Example Programs: See page 167 in Ben's textbook
 ;***********************************************************
@@ -205,7 +205,7 @@ MAIN:
 IncreaseSpeed:	
 		push	mpr			; Save mpr register
 		push	waitcnt			; Save wait register
-		in		mpr, SREG	; Save program state
+		in	mpr, SREG	; Save program state
 		push	mpr			;
 		
 		; Count UP the counter0 17 unit
