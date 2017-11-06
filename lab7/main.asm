@@ -19,6 +19,7 @@
 ;*	Internal Register Definitions
 ;***********************************************************
 .def	mpr = r16				; Multipurpose register
+.def	A = r17
 
 ;***********************************************************
 ;*	Constants
@@ -29,16 +30,33 @@
 .equ	Button2 = 2				; Left Whisker Input Bit
 .equ	Button3 = 3				; Left Whisker Input Bit
 
-.equ	EngEnR = 4				; right Engine Enable Bit
-.equ	EngEnL = 7				; left Engine Enable Bit
-.equ	EngDirR = 5				; right Engine Direction Bit
-.equ	EngDirL = 6				; left Engine Direction Bit
+.equ	LED6 = 5				; L6 physically
+.equ	LED7 = 6				; L7 physically
+
+.equ	LED1 = 0				; L1 physically
+.equ	LED2 = 1				; L2 physically
+.equ	LED3 = 2				; L3 physically
+.equ	LED4 = 3				; L4 physically
+
+.equ	CS00 = 0
+.equ	CS01 = 1
+.equ	CS02 = 3
+
+.equ	WGM00 = 6
+.equ	WGM01 = 4
+
+.equ	FOC0 = 7
+
+.equ	COM00 = 4
+.equ	COM01 = 5
 
 ;***********************************************************
 ;These macros are the values to make the TekBot Move.
 ;***********************************************************
 
-.equ	MovFwd = (1<<EngDirR|1<<EngDirL)	; Move Forward Command
+.equ	MovFwd = (1<<LED6|1<<LED7)		; Move Forward Command
+.equ	MinSpeed = (0b00000000|MovFwd)	; Move Backward Command
+.equ	MaxSpeed = (0b00001111|MovFwd)	; Move Backward Command
 
 ;***********************************************************
 ;*	Start of Code Segment
@@ -67,12 +85,6 @@
 
 ; Timer Interrupt Vectors
 ; See page 23, AVR Starter Guide
-.org	$0012	Timer2_Comp
-		rjmp	Timer2_Comp
-		reti
-.org	$0014	Timer2_Overflow
-		rjmp	Timer2_Overflow
-		reti
 .org	$001E	Timer0_Comp
 		rjmp	Timer0_Comp
 		reti
@@ -111,9 +123,12 @@ INIT:
 		; Configure the External Interrupt Mask
 		ldi		mpr, (1<<INT0|1<<INT1|1<<INT2|1<<INT3)
 		out		EIMSK, mpr
-	; Configure 8-bit Timer/Counters
-		
-								; no prescaling
+	; Configure 8-bit Timer/Counters, 
+		; no prescaling
+		LDI		A, 0b01101001
+		;LDI	A, 0b01111001
+		OUT		TCCR0, A
+								
 
 	; Initialize TekBot Forward Movement
 		ldi		mpr, MovFwd						; Load Move Forward Command
@@ -130,8 +145,8 @@ INIT:
 ;Fast PWN Mode: 
 ;Timer/Counter0 consists of 3 registers:
 ;- Timer/Counter 0 register:			TCNT0
-;- Output Compare Register 0:		OCR0
-;- Timer/Counter Control Register 0: TCCR0
+;- Output Compare Register 0:			OCR0
+;- Timer/Counter Control Register 0:	TCCR0
 
 ;Most basic way to use: Write value to TCNT0 and let it
 ;count up to max value 
@@ -140,12 +155,9 @@ INIT:
 ;			generate interrupt 5.4.3
 ;-> Elapsed time: Page ...
 
-;The exact behavior of Timer/Counter0 depends on its mode of operation 
-;(see Section 5.4.4), which is controlled by setting TCCR0 (see Section 5.4.5).
-
+; TIMSK
 ;Enable TOV0 and OCF0 as interrupt by configuring 
 ;Timer/Counter Interrupt Mask Register TIMSK
-
 ;OCF0 and TOV0 flags are masked by OCIE0 and TOIE0 bits, respectively, in TIMSK
 ;OCIE0 and TOIE bits must be set to 1 to enable these interrupts
 
@@ -196,6 +208,7 @@ IncreaseSpeed:
 		in		mpr, SREG	; Save program state
 		push	mpr			;
 		
+		; Count UP the counter0 17 unit
 
 		
 		
@@ -218,7 +231,7 @@ DecreaseSpeed:
 		push	mpr			;
 		
 
-		
+		; Count DOWN the counter0 17 unit
 		
 		pop		mpr		; Restore program state
 		out		SREG, mpr	;
@@ -238,7 +251,7 @@ MaxSpeed:
 		in		mpr, SREG	; Save program state
 		push	mpr			;
 		
-
+		; Set counter0 to MAX
 		
 		
 		pop		mpr		; Restore program state
@@ -259,7 +272,7 @@ MinSpeed:
 		in		mpr, SREG	; Save program state
 		push	mpr			;
 		
-
+		; Set counter0 to MIN
 		
 		
 		pop		mpr		; Restore program state
