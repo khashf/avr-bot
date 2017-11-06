@@ -67,6 +67,18 @@
 
 ; Timer Interrupt Vectors
 ; See page 23, AVR Starter Guide
+.org	$0012	Timer2_Comp
+		rjmp	Timer2_Comp
+		reti
+.org	$0014	Timer2_Overflow
+		rjmp	Timer2_Overflow
+		reti
+.org	$001E	Timer0_Comp
+		rjmp	Timer0_Comp
+		reti
+.org	$0020	Timer0_Overflow
+		rjmp
+		reti
 
 .org	$0046					; end of interrupt vectors
 
@@ -194,6 +206,90 @@ MaxSpeed:
 ;		
 ;-----------------------------------------------------------
 MinSpeed:	
+		push	mpr			; Save mpr register
+		push	waitcnt			; Save wait register
+		in		mpr, SREG	; Save program state
+		push	mpr			;
+		
+
+		
+		
+		pop		mpr		; Restore program state
+		out		SREG, mpr	;
+		pop		waitcnt		; Restore wait register
+		pop		mpr		; Restore mpr
+
+		ret						; End a function with RET
+
+;-----------------------------------------------------------
+; Timer0_Comp
+; 
+;		
+;-----------------------------------------------------------
+Timer0_Comp:	
+		push	mpr			; Save mpr register
+		push	waitcnt			; Save wait register
+		in		mpr, SREG	; Save program state
+		push	mpr			;
+		
+
+		
+		
+		pop		mpr		; Restore program state
+		out		SREG, mpr	;
+		pop		waitcnt		; Restore wait register
+		pop		mpr		; Restore mpr
+
+		ret						; End a function with RET
+
+;-----------------------------------------------------------
+; Timer0_Overflow
+; 
+;		
+;-----------------------------------------------------------
+Timer0_Overflow:	
+		push	mpr			; Save mpr register
+		push	waitcnt			; Save wait register
+		in		mpr, SREG	; Save program state
+		push	mpr			;
+		
+
+		
+		
+		pop		mpr		; Restore program state
+		out		SREG, mpr	;
+		pop		waitcnt		; Restore wait register
+		pop		mpr		; Restore mpr
+
+		ret						; End a function with RET
+
+;-----------------------------------------------------------
+; Timer2_Comp
+; 
+;		
+;-----------------------------------------------------------
+Timer2_Comp:	
+		push	mpr			; Save mpr register
+		push	waitcnt			; Save wait register
+		in		mpr, SREG	; Save program state
+		push	mpr			;
+		
+
+		
+		
+		pop		mpr		; Restore program state
+		out		SREG, mpr	;
+		pop		waitcnt		; Restore wait register
+		pop		mpr		; Restore mpr
+
+		ret						; End a function with RET
+
+;-----------------------------------------------------------
+; Timer2_Overflow
+; 
+;		
+;-----------------------------------------------------------
+Timer2_Overflow:	
 		push	mpr			; Save mpr register
 		push	waitcnt			; Save wait register
 		in		mpr, SREG	; Save program state
