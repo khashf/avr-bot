@@ -22,6 +22,7 @@
 .def	A = r17
 .def	speed = r18
 .def	timeCount = r19
+.def	waitcnt = r20
 
 ;***********************************************************
 ;*	Constants
@@ -208,7 +209,15 @@ IncreaseSpeed:
 		ldi		A, step
 		add		mpr, A	
 		out		OCR0, mpr
+
+		mov		mpr, speed
+		ori		mpr, MovFwd
+		out		PORTB, mpr
+
 IncSkip:
+
+		rcall Wait5ms
+
 		ldi		mpr, (1<<INT0|1<<INT1|1<<INT2|1<<INT3)
 		out		EIFR, mpr
 		out		EIMSK, mpr
@@ -232,7 +241,15 @@ DecreaseSpeed:
 		in		mpr, OCR0
 		subi	mpr, step
 		out		OCR0, mpr
+
+		mov		mpr, speed
+		ori		mpr, MovFwd
+		out		PORTB, mpr
+
 		DecSkip:
+
+		rcall Wait5ms
+
 		ldi		mpr, (1<<INT0|1<<INT1|1<<INT2|1<<INT3)
 		out		EIMSK, mpr
 		out		EIFR, mpr
@@ -253,6 +270,12 @@ SetMaxSpeed:
 		ldi		speed, 15
 		ldi		mpr, 255
 		out		OCR0, mpr
+
+		mov		mpr, speed
+		ori		mpr, MovFwd
+		out		PORTB, mpr
+
+		rcall Wait5ms
 
 		ldi		mpr, (1<<INT0|1<<INT1|1<<INT2|1<<INT3)
 		out		EIMSK, mpr
@@ -275,12 +298,41 @@ SetMinSpeed:
 		ldi		mpr, 0
 		out		OCR0, mpr
 
+		mov		mpr, speed
+		ori		mpr, MovFwd
+		out		PORTB, mpr
+
+		rcall Wait5ms
+
 		ldi		mpr, (1<<INT0|1<<INT1|1<<INT2|1<<INT3)
 		out		EIMSK, mpr
 		out		EIFR, mpr
 		sei
 		ret						; End a function with RET
 
+
+Wait5ms:						; this function exists because of debouncing being annoying
+		push mpr
+		in mpr, SREG
+		push mpr
+		ldi waitcnt, 160
+WaitLoop0:
+		ldi mpr, 100
+WaitLoop1:
+		ldi A, 50
+WaitLoop2:
+		dec A
+		cpi A, 0
+		brne WaitLoop2
+		dec mpr
+		cpi mpr, 0
+		brne WaitLoop1
+		dec waitcnt
+		cpi waitcnt, 0
+		brne WaitLoop0
+		pop mpr
+		out SREG, mpr
+		pop mpr
 ;***********************************************************
 ;*	Stored Program Data
 ;***********************************************************
