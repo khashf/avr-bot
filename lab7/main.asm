@@ -1,6 +1,6 @@
 ;***********************************************************
 ;*
-;*	Enter Name of file here
+;*	trevor_swope_and_khuong_luu_lab7_sourcecode.asm
 ;*
 ;*	Enter the description of the program here
 ;*
@@ -8,8 +8,8 @@
 ;*
 ;***********************************************************
 ;*
-;*	 Author: Enter your name
-;*	   Date: Enter Date
+;*	 Author: Trevor Swope, Khuong Luu
+;*	   Date: Nov. 12, 2017
 ;*
 ;***********************************************************
 
@@ -20,6 +20,8 @@
 ;***********************************************************
 .def	mpr = r16				; Multipurpose register
 .def	A = r17
+.def	speed = r18
+.def	timeCount = r19
 
 ;***********************************************************
 ;*	Constants
@@ -37,26 +39,14 @@
 .equ	LED2 = 1				; L2 physically
 .equ	LED3 = 2				; L3 physically
 .equ	LED4 = 3				; L4 physically
-
-.equ	CS00 = 0
-.equ	CS01 = 1
-.equ	CS02 = 3
-
-.equ	WGM00 = 6
-.equ	WGM01 = 4
-
-.equ	FOC0 = 7
-
-.equ	COM00 = 4
-.equ	COM01 = 5
-
+.equ	step = 17
 ;***********************************************************
 ;These macros are the values to make the TekBot Move.
 ;***********************************************************
 
 .equ	MovFwd = (1<<LED6|1<<LED7)		; Move Forward Command
-.equ	MinSpeed = (0b00000000|MovFwd)	; Move Backward Command
-.equ	MaxSpeed = (0b00001111|MovFwd)	; Move Backward Command
+.equ	MinSpeed = (0b00000000|MovFwd)
+.equ	MaxSpeed = (0b00001111|MovFwd)
 
 ;***********************************************************
 ;*	Start of Code Segment
@@ -77,20 +67,20 @@
 		rjmp	DecreaseSpeed
 		reti	
 .org	$0006	; INT2
-		rjmp	MaxSpeed
+		rjmp	SetMaxSpeed
 		reti
 .org	$0008	; INT3
-		rjmp	MinSpeed
+		rjmp	SetMinSpeed
 		reti
 
 ; Timer Interrupt Vectors
 ; See page 23, AVR Starter Guide
-.org	$001E	Timer0_Comp
-		rjmp	Timer0_Comp
-		reti
-.org	$0020	Timer0_Overflow
-		rjmp	Timer0_Overflow
-		reti
+;.org	$001E ;Timer0_Comp
+;		rjmp
+;		reti
+;.org	$0020 ;Timer0_Overflow
+;		rjmp
+;		reti
 
 .org	$0046					; end of interrupt vectors
 
@@ -114,27 +104,32 @@ INIT:
 		ldi		mpr, (0<<Button0|0<<Button1|0<<Button2|0<<Button3)		
 		out		DDRD, mpr		; for input
 		; Initialize Port D Data Register
-		ldi		mpr, (1<<Button0|1<<Button1|1<<Button2|1<<Button3)		
-		out		PORTD, mpr		; so all Port D inputs are Tri-State
+		;ldi		mpr, (1<<Button0|1<<Button1|1<<Button2|1<<Button3)		
+		;out		PORTD, mpr		; so all Port D inputs are Tri-State
 	; Configure External Interrupts, if needed
 		; Set the Interrupt Sense Control to falling edge
-		ldi		mpr, (1<<ISC01)|(0<<ISC00)|(1<<ISC11)|(0<<ISC10)
+		ldi		mpr, (1<<ISC01|0<<ISC00|1<<ISC11|0<<ISC10|1<<ISC21|0<<ISC20|1<<ISC31|0<<ISC30)
 		sts		EICRA, mpr
 		; Configure the External Interrupt Mask
 		ldi		mpr, (1<<INT0|1<<INT1|1<<INT2|1<<INT3)
 		out		EIMSK, mpr
 	; Configure 8-bit Timer/Counters, 
 		; no prescaling
-		LDI	A, 0b01111000 // Try CS00 = 1 or 0
-		OUT		TCCR0, A
+		ldi		A, 0b01111000 ;Try CS00 = 1 or 0
+		out		TCCR0, A
 								
 
 	; Initialize TekBot Forward Movement
 		ldi		mpr, MovFwd						; Load Move Forward Command
 		out		PORTB, mpr						; Send command to motors
+		
 	; Set initial speed, display on Port B pins 3:0
-
+		ldi		mpr, 0
+		out		OCR0, mpr ;start stopped, duty cycle at 0%
+		ldi		speed, 0
 	; Enable global interrupts (if any are used)
+
+	; Challenge: add seconds-since-last-change counter
 		sei
 
 ;***********************************************************
@@ -185,12 +180,9 @@ INIT:
 ;*	Main Program
 ;***********************************************************
 MAIN:
-		
-		; poll Port D pushbuttons (if needed)
-
-								; if pressed, adjust speed
-								; also, adjust speed indication
-
+		mov		mpr, speed
+		ori		mpr, MovFwd
+		out		PORTB, mpr
 		rjmp	MAIN			; return to top of MAIN
 
 ;***********************************************************
@@ -202,21 +194,26 @@ MAIN:
 ; 
 ;		
 ;-----------------------------------------------------------
-IncreaseSpeed:	
-		push	mpr			; Save mpr register
-		push	waitcnt			; Save wait register
-		in	mpr, SREG	; Save program state
-		push	mpr			;
+IncreaseSpeed:
+		cli
+		ldi		mpr, (0<<INT0|0<<INT1|0<<INT2|0<<INT3) ;this doesn't seem to be working to fulfill requirement #3 so far :(
+		out		EIMSK, mpr
+		out		EIFR, mpr
 		
-		; Count UP the counter0 17 unit
-
+		cpi		speed, 15
+		breq	IncSkip
+		ldi		mpr, 1
+		add		speed, mpr
+		in		mpr, OCR0
+		ldi		A, step
+		add		mpr, A	
+		out		OCR0, mpr
+IncSkip:
+		ldi		mpr, (1<<INT0|1<<INT1|1<<INT2|1<<INT3)
+		out		EIFR, mpr
+		out		EIMSK, mpr
+		sei
 		
-		
-		pop		mpr		; Restore program state
-		out		SREG, mpr	;
-		pop		waitcnt		; Restore wait register
-		pop		mpr		; Restore mpr
-
 		ret						; End a function with RET
 
 ;-----------------------------------------------------------
@@ -224,146 +221,64 @@ IncreaseSpeed:
 ; 
 ;		
 ;-----------------------------------------------------------
-DecreaseSpeed:	
-		push	mpr			; Save mpr register
-		push	waitcnt			; Save wait register
-		in		mpr, SREG	; Save program state
-		push	mpr			;
-		
-
-		; Count DOWN the counter0 17 unit
-		
-		pop		mpr		; Restore program state
-		out		SREG, mpr	;
-		pop		waitcnt		; Restore wait register
-		pop		mpr		; Restore mpr
-
+DecreaseSpeed:
+		cli
+		ldi		mpr, (0<<INT0|0<<INT1|0<<INT2|0<<INT3)
+		out		EIMSK, mpr
+		out		EIFR, mpr
+		cpi		speed, 0
+		breq	DecSkip
+		subi	speed, 1
+		in		mpr, OCR0
+		subi	mpr, step
+		out		OCR0, mpr
+		DecSkip:
+		ldi		mpr, (1<<INT0|1<<INT1|1<<INT2|1<<INT3)
+		out		EIMSK, mpr
+		out		EIFR, mpr
+		sei
 		ret						; End a function with RET
 
 ;-----------------------------------------------------------
-; MaxSpeed
+; SetMaxSpeed
 ; 
 ;		
 ;-----------------------------------------------------------
-MaxSpeed:	
-		push	mpr			; Save mpr register
-		push	waitcnt			; Save wait register
-		in		mpr, SREG	; Save program state
-		push	mpr			;
-		
-		; Set counter0 to MAX
-		
-		
-		pop		mpr		; Restore program state
-		out		SREG, mpr	;
-		pop		waitcnt		; Restore wait register
-		pop		mpr		; Restore mpr
+SetMaxSpeed:
+		cli
+		ldi		mpr, (0<<INT0|0<<INT1|0<<INT2|0<<INT3)
+		out		EIMSK, mpr
+		out		EIFR, mpr
 
+		ldi		speed, 15
+		ldi		mpr, 255
+		out		OCR0, mpr
+
+		ldi		mpr, (1<<INT0|1<<INT1|1<<INT2|1<<INT3)
+		out		EIMSK, mpr
+		out		EIFR, mpr
+		sei
 		ret						; End a function with RET
 
 ;-----------------------------------------------------------
-; MinSpeed
+; SetMinSpeed
 ; 
 ;		
 ;-----------------------------------------------------------
-MinSpeed:	
-		push	mpr			; Save mpr register
-		push	waitcnt			; Save wait register
-		in		mpr, SREG	; Save program state
-		push	mpr			;
-		
-		; Set counter0 to MIN
-		
-		
-		pop		mpr		; Restore program state
-		out		SREG, mpr	;
-		pop		waitcnt		; Restore wait register
-		pop		mpr		; Restore mpr
+SetMinSpeed:
+		cli
+		ldi		mpr, (0<<INT0|0<<INT1|0<<INT2|0<<INT3)
+		out		EIMSK, mpr
+		out		EIFR, mpr
 
-		ret						; End a function with RET
+		ldi		speed, 0
+		ldi		mpr, 0
+		out		OCR0, mpr
 
-;-----------------------------------------------------------
-; Timer0_Comp
-; 
-;		
-;-----------------------------------------------------------
-Timer0_Comp:	
-		push	mpr			; Save mpr register
-		push	waitcnt			; Save wait register
-		in		mpr, SREG	; Save program state
-		push	mpr			;
-		
-
-		
-		
-		pop		mpr		; Restore program state
-		out		SREG, mpr	;
-		pop		waitcnt		; Restore wait register
-		pop		mpr		; Restore mpr
-
-		ret						; End a function with RET
-
-;-----------------------------------------------------------
-; Timer0_Overflow
-; 
-;		
-;-----------------------------------------------------------
-Timer0_Overflow:	
-		push	mpr			; Save mpr register
-		push	waitcnt			; Save wait register
-		in		mpr, SREG	; Save program state
-		push	mpr			;
-		
-
-		
-		
-		pop		mpr		; Restore program state
-		out		SREG, mpr	;
-		pop		waitcnt		; Restore wait register
-		pop		mpr		; Restore mpr
-
-		ret						; End a function with RET
-
-;-----------------------------------------------------------
-; Timer2_Comp
-; 
-;		
-;-----------------------------------------------------------
-Timer2_Comp:	
-		push	mpr			; Save mpr register
-		push	waitcnt			; Save wait register
-		in		mpr, SREG	; Save program state
-		push	mpr			;
-		
-
-		
-		
-		pop		mpr		; Restore program state
-		out		SREG, mpr	;
-		pop		waitcnt		; Restore wait register
-		pop		mpr		; Restore mpr
-
-		ret						; End a function with RET
-
-;-----------------------------------------------------------
-; Timer2_Overflow
-; 
-;		
-;-----------------------------------------------------------
-Timer2_Overflow:	
-		push	mpr			; Save mpr register
-		push	waitcnt			; Save wait register
-		in		mpr, SREG	; Save program state
-		push	mpr			;
-		
-
-		
-		
-		pop		mpr		; Restore program state
-		out		SREG, mpr	;
-		pop		waitcnt		; Restore wait register
-		pop		mpr		; Restore mpr
-
+		ldi		mpr, (1<<INT0|1<<INT1|1<<INT2|1<<INT3)
+		out		EIMSK, mpr
+		out		EIFR, mpr
+		sei
 		ret						; End a function with RET
 
 ;***********************************************************
