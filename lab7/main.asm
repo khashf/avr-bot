@@ -22,7 +22,6 @@
 .def	mpr = r16				; Multipurpose register
 .def	A = r17
 .def	speed = r18
-.def	timeCount = r19
 .def	waitcnt = r20
 
 ;***********************************************************
@@ -80,9 +79,6 @@
 .org	$0008	; INT3 - Button S4
 		rjmp	SetMinSpeed
 		reti
-.org	$0018	; TIMER1_COMPA: Timer/Counter1 compare match A
-		rjmp	IncTime
-		reti
 
 .org	$0046					; end of interrupt vectors
 		
@@ -119,13 +115,9 @@ INIT:
 		; WGM01:WGM00 = 11 - Fast PWM mode
 		; COM01:COM00 = 10 - Clear OC0 on compare match, set OC0 at TOP
 		; CS02:CS01:CS00 = 001 - No prescaling
-		;ldi	A, 0b01101001
-		;ldi	A, (1<<CS00|0<<CS01|0<<CS02|1<<WGM01|0<<COM00|1<<COM01|1<<WGM00|0<<FOC0)
 		ldi		A, (0<<FOC0|1<<WGM00|1<<COM01|0<<COM00|1<<WGM01|0<<CS02|0<<CS01|1<<CS00)
 		out		TCCR0, A
 		out		TCCR2, A
-	; Configure 16-bits Timer/Counter
-		ldi		timeCount, 0
 	; Initialize TekBot Forward Movement
 		ldi		mpr, MovFwd						; 
 		out		PORTB, mpr						; Make bot move forward	
@@ -300,17 +292,8 @@ SetMinSpeed:
 		out		EIMSK, mpr
 		out		EIFR, mpr
 		sei
-		ret						; End a function with RET
 
-;-----------------------------------------------------------
-; IncreaseTime		
-;-----------------------------------------------------------
-IncTime:
-		ldi A, 0
-		out	TCNT1H, A
-		out	TCNT1L, A
-		inc timeCount
-		ret
+		ret						; End a function with RET
 
 ;-----------------------------------------------------------
 ; Wait5ms		
