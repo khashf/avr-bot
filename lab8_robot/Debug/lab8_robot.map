@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.6  C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8_robot\main.asm Mon Nov 13 12:55:52 2017
+AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm Mon Nov 13 13:12:40 2017
 
 
 EQU  SIGNATURE_000 0000001e
@@ -868,12 +868,24 @@ EQU  TWIaddr      00000042
 EQU  SPMRaddr     00000044
 EQU  INT_VECTORS_SIZE 00000046
 DEF  mpr          r16
+DEF  waitcnt      r17
+DEF  ilcnt        r18
+DEF  olcnt        r19
+DEF  nHits        r20
+DEF  hitSide      r21
+EQU  ReverseTime  00000064
+EQU  TurnLeftTime 00000064
+EQU  TurnRightTime 00000064
+EQU  TurnAroundTime 000000c8
 EQU  WskrR        00000000
 EQU  WskrL        00000001
 EQU  EngEnR       00000004
 EQU  EngEnL       00000007
 EQU  EngDirR      00000005
 EQU  EngDirL      00000006
+EQU  WasHitLeft   00000000
+EQU  WasHitRight  00000001
+EQU  WasNeither   00000002
 EQU  BotAddress   00000019
 EQU  MovFwd       00000060
 EQU  MovBck       00000000
@@ -881,7 +893,19 @@ EQU  TurnR        00000040
 EQU  TurnL        00000020
 EQU  Halt         00000090
 CSEG INIT         00000046
-CSEG RightWhiskerHit 00000069
-CSEG LeftWhiskerHit 00000068
-CSEG USART1_RXC   0000006a
-CSEG MAIN         00000067
+CSEG HitRight     0000006e
+CSEG HitLeft      00000091
+CSEG USART1_RXC   000000b4
+CSEG MAIN         0000006b
+CSEG Wait         000000b5
+CSEG CountAltTurnRight 0000007c
+CSEG SetTurnLeftTime 00000084
+CSEG SetTurnAroundTimeInLeft 00000080
+CSEG TurnLeft     00000087
+CSEG CountAltTurnLeft 0000009f
+CSEG SetTurnRightTime 000000a7
+CSEG SetTurnAroundTimeInRight 000000a3
+CSEG TurnRight    000000aa
+CSEG Loop         000000b8
+CSEG OLoop        000000b9
+CSEG ILoop        000000ba

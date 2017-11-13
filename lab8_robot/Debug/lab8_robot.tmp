@@ -1,18 +1,18 @@
 <ASSEMBLER_INFO>
  <VERSION>2.2.6</VERSION>
  <DEVICE>"ATmega128"</DEVICE>
- <WORKING_DIR>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8_robot\Debug</WORKING_DIR>
+ <WORKING_DIR>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\Debug</WORKING_DIR>
  <INCLUDE_PATH>
   <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc</DIR>
   <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
   <DIR></DIR>
  </INCLUDE_PATH>
- <SOURCE_FILE>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8_robot\main.asm</SOURCE_FILE>
+ <SOURCE_FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</SOURCE_FILE>
  <INCLUDED_FILES>
   <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc</FILE>
  </INCLUDED_FILES>
  <OBJECT_FILES>
-  <FILE>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8_robot\Debug\lab8_robot.obj</FILE>
+  <FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\Debug\lab8_robot.obj</FILE>
  </OBJECT_FILES>
  <HEX_FILES>
   <FILE>lab8_robot.hex</FILE>
@@ -22,10 +22,22 @@
   <FILE>lab8_robot.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <INIT><FILE>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8_robot\main.asm</FILE><LINE>70</LINE></INIT>
-  <RightWhiskerHit><FILE>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8_robot\main.asm</FILE><LINE>127</LINE></RightWhiskerHit>
-  <LeftWhiskerHit><FILE>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8_robot\main.asm</FILE><LINE>123</LINE></LeftWhiskerHit>
-  <USART1_RXC><FILE>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8_robot\main.asm</FILE><LINE>131</LINE></USART1_RXC>
-  <MAIN><FILE>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8_robot\main.asm</FILE><LINE>116</LINE></MAIN>
+  <INIT><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>87</LINE></INIT>
+  <HitRight><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>147</LINE></HitRight>
+  <HitLeft><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>213</LINE></HitLeft>
+  <USART1_RXC><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>277</LINE></USART1_RXC>
+  <MAIN><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>137</LINE></MAIN>
+  <Wait><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>286</LINE></Wait>
+  <CountAltTurnRight><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>171</LINE></CountAltTurnRight>
+  <SetTurnLeftTime><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>185</LINE></SetTurnLeftTime>
+  <SetTurnAroundTimeInLeft><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>179</LINE></SetTurnAroundTimeInLeft>
+  <TurnLeft><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>190</LINE></TurnLeft>
+  <CountAltTurnLeft><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>237</LINE></CountAltTurnLeft>
+  <SetTurnRightTime><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>251</LINE></SetTurnRightTime>
+  <SetTurnAroundTimeInRight><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>245</LINE></SetTurnAroundTimeInRight>
+  <TurnRight><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>256</LINE></TurnRight>
+  <Loop><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>291</LINE></Loop>
+  <OLoop><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>292</LINE></OLoop>
+  <ILoop><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm</FILE><LINE>293</LINE></ILoop>
  </LABELS>
 </ASSEMBLER_INFO>
