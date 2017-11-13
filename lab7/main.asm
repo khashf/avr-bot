@@ -32,10 +32,10 @@
 .equ	Button1 = 1				; Left Whisker Input Bit
 .equ	Button2 = 2				; Left Whisker Input Bit
 .equ	Button3 = 3				; Left Whisker Input Bit
-
+.equ	EngEnableL = 4			; Left engine enable bit
 .equ	LED6 = 5				; L6 physically
 .equ	LED7 = 6				; L7 physically
-
+.equ	EngEnableR = 7			; Right engine enable bit
 .equ	LED1 = 0				; L1 physically
 .equ	LED2 = 1				; L2 physically
 .equ	LED3 = 2				; L3 physically
@@ -96,8 +96,8 @@ INIT:
 		out		SPH, mpr
 	; Configure I/O ports
 		; Initialize Port B for output
-		ldi		mpr, $FF		; Set Port B Data Direction Register
-		out		DDRB, mpr		; for output
+		ldi		mpr, $FF
+		out		DDRB, mpr
 		ldi		mpr, $00		; Initialize Port B Data Register
 		out		PORTB, mpr		; so all Port B outputs are low	
 		; Initialize Port D for input
@@ -105,8 +105,8 @@ INIT:
 		ldi		mpr, (0<<Button0|0<<Button1|0<<Button2|0<<Button3)		
 		out		DDRD, mpr		; for input
 		; Initialize Port D Data Register
-		;ldi		mpr, (1<<Button0|1<<Button1|1<<Button2|1<<Button3)		
-		;out		PORTD, mpr		; so all Port D inputs are Tri-State
+		ldi		mpr, (1<<Button0|1<<Button1|1<<Button2|1<<Button3)		
+		out		PORTD, mpr		; so all Port D inputs are Tri-State
 	; Configure External Interrupts, if needed
 		; Set the Interrupt Sense Control to falling edge
 		ldi		mpr, (1<<ISC01|0<<ISC00|1<<ISC11|0<<ISC10|1<<ISC21|0<<ISC20|1<<ISC31|0<<ISC30)
@@ -116,8 +116,10 @@ INIT:
 		out		EIMSK, mpr
 	; Configure 8-bit Timer/Counters, 
 		; no prescaling
-		ldi		A, 0b01111000 ;Try CS00 = 1 or 0
+		ldi		A, 0b01101001 ;Try CS00 = 1 or 0
 		out		TCCR0, A
+		ldi		A, 0b01101001
+		out		TCCR2, A
 								
 
 	; Initialize TekBot Forward Movement
@@ -125,9 +127,10 @@ INIT:
 		out		PORTB, mpr						; Send command to motors
 		
 	; Set initial speed, display on Port B pins 3:0
+		ldi		speed, 0
 		ldi		mpr, 0
 		out		OCR0, mpr ;start stopped, duty cycle at 0%
-		ldi		speed, 0
+		out		OCR2, mpr
 	; Enable global interrupts (if any are used)
 
 	; Challenge: add seconds-since-last-change counter
@@ -181,9 +184,9 @@ INIT:
 ;*	Main Program
 ;***********************************************************
 MAIN:
-		mov		mpr, speed
-		ori		mpr, MovFwd
-		out		PORTB, mpr
+		;mov		mpr, speed
+		;ori		mpr, MovFwd
+		;out		PORTB, mpr
 		rjmp	MAIN			; return to top of MAIN
 
 ;***********************************************************
@@ -207,8 +210,9 @@ IncreaseSpeed:
 		add		speed, mpr
 		in		mpr, OCR0
 		ldi		A, step
-		add		mpr, A	
+		add		mpr, A
 		out		OCR0, mpr
+		out		OCR2, mpr
 
 		mov		mpr, speed
 		ori		mpr, MovFwd
@@ -241,6 +245,7 @@ DecreaseSpeed:
 		in		mpr, OCR0
 		subi	mpr, step
 		out		OCR0, mpr
+		out		OCR2, mpr
 
 		mov		mpr, speed
 		ori		mpr, MovFwd
@@ -270,6 +275,7 @@ SetMaxSpeed:
 		ldi		speed, 15
 		ldi		mpr, 255
 		out		OCR0, mpr
+		;out		OCR2, mpr
 
 		mov		mpr, speed
 		ori		mpr, MovFwd
@@ -297,6 +303,7 @@ SetMinSpeed:
 		ldi		speed, 0
 		ldi		mpr, 0
 		out		OCR0, mpr
+		;out		OCR2, mpr
 
 		mov		mpr, speed
 		ori		mpr, MovFwd
