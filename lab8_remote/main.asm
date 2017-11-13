@@ -21,6 +21,7 @@
 .def	mpr = r16				; Multi-Purpose Register
 .def	sendcode = r17
 .def	lastpress = r18
+.def	command = r19
 
 .equ	Button0 = 0
 .equ	Button1 = 1
@@ -146,54 +147,49 @@ Next7:
 	
 
 SendMovFwd:
-	ldi	sendcode, BotAddress
-	rcall USART1_Transmit
-	ldi sendcode, MovFwd
-	rcall USART1_Transmit
+	ldi command, MovFwd
+	rcall USART1_Transmit_Command
 	
 	ret
 
 SendMovBck:
-	ldi	sendcode, BotAddress
-	rcall USART1_Transmit
-	ldi sendcode, MovBck
-	rcall USART1_Transmit
+	ldi	command, MovBck
+	rcall USART1_Transmit_Command
 	
 	ret
 
 SendTurnR:
-	ldi	sendcode, BotAddress
-	rcall USART1_Transmit
-	ldi sendcode, TurnR
-	rcall USART1_Transmit
+	ldi command, TurnR
+	rcall USART1_Transmit_Command
 	
 	ret
 
 SendTurnL:
-	ldi	sendcode, BotAddress
-	rcall USART1_Transmit
-	ldi sendcode, TurnL
-	rcall USART1_Transmit
+	ldi command, TurnL
+	rcall USART1_Transmit_Command
 	
 	ret
 
 SendHalt:
-	ldi	sendcode, BotAddress
-	rcall USART1_Transmit
-	ldi sendcode, Halt
-	rcall USART1_Transmit
+	ldi command, Halt
+	rcall USART1_Transmit_Command
 	
 	ret
 
 SendFreeze:
-	ldi	sendcode, BotAddress
-	rcall USART1_Transmit
-	ldi sendcode, Freeze
-	rcall USART1_Transmit
+	ldi command, Freeze
+	rcall USART1_Transmit_Command
 	
 	ret
 
+USART1_Transmit_Command:
+	ldi		sendcode, BotAddress
+	rcall USART1_Transmit
+	mov		sendcode, command
+	rcall USART1_Transmit
+	ret
 USART1_Transmit:
+	
 	ldi		XH, high(UCSR1A)
 	ldi		XL, low(UCSR1A)
 	ld		mpr, X
