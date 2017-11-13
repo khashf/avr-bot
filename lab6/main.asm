@@ -1,15 +1,15 @@
 ;***********************************************************
 ;*
-;*	Enter Name of file here
+;*	lab6/main.asm
 ;*
-;*	Enter the description of the program here
+;*	
 ;*
-;*	This is the skeleton file for Lab 6 of ECE 375
+;*	
 ;*
 ;***********************************************************
 ;*
-;*	 Author: Enter your name
-;*	   Date: Enter Date
+;*	 Author: Khuong Luu & Trevor Swope
+;*	   Date: 11/05/2017
 ;*
 ;***********************************************************
 
@@ -134,17 +134,11 @@ MAIN:
 ;		
 ;-----------------------------------------------------------
 HitRight:							; Begin a function with a label
-		
-		/*push	mpr			; Save mpr register
-		push	waitcnt		; Save wait register
-		in		mpr, SREG	; Save program state
-		push	mpr			;*/
-		
 		; Clear interrupt and disable interrupts
-		cli
-		ldi		mpr, (0<<INT0|0<<INT1)
-		out		EIMSK, mpr
-		out		EIFR, mpr
+		cli							; clear I-bit in SREG
+		ldi		mpr, (0<<INT0|0<<INT1) ; clear corresponding bit
+		out		EIMSK, mpr			; in EIMSK register
+		out		EIFR, mpr			; in EIFR register
 
 		; Move back
 		ldi		mpr, MovBck
@@ -194,14 +188,9 @@ TurnLeft:
 
 		; Set interrupt back and start listen for interrupt
 		ldi		mpr, (1<<INT0|1<<INT1)
-		out		EIMSK, mpr
-		out		EIFR, mpr
-		sei
-
-		/*pop		mpr		; Restore program state
-		out		SREG, mpr	;
-		pop		waitcnt		; Restore wait register
-		pop		mpr		; Restore mpr*/
+		out		EIMSK, mpr			; in EIMSK register
+		out		EIFR, mpr			; in EIFR register
+		sei							; set I-bit in SREG
 
 		ret					; End a function with RET
 
@@ -211,16 +200,11 @@ TurnLeft:
 ;		
 ;-----------------------------------------------------------
 HitLeft:	
-		/*push	mpr			; Save mpr register
-		push	waitcnt			; Save wait register
-		in		mpr, SREG	; Save program state
-		push	mpr			;*/
-
 		; Clear interrupt and disable interrupts
-		cli
+		cli							; clear I-bit in SREG
 		ldi		mpr, (0<<INT0|0<<INT1)
-		out		EIMSK, mpr
-		out		EIFR, mpr
+		out		EIMSK, mpr			; in EIMSK register
+		out		EIFR, mpr			; in EIFR register
 
 		; Move back
 		ldi		mpr, MovBck
@@ -270,14 +254,9 @@ TurnRight:
 
 		; Set interrupt back and start listen for interrupt
 		ldi		mpr, (1<<INT0|1<<INT1)
-		out		EIMSK, mpr
-		out		EIFR, mpr
-		sei
-
-		/*pop		mpr		; Restore program state
-		out		SREG, mpr	;
-		pop		waitcnt		; Restore wait register
-		pop		mpr		; Restore mpr*/
+		out		EIMSK, mpr			; in EIMSK register
+		out		EIFR, mpr			; in EIFR register
+		sei							; set I-bit in SREG
 
 		ret					; End a function with RET
 

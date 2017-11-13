@@ -1,0 +1,41 @@
+;***********************************************************
+;*	NOTES
+;***********************************************************
+
+
+Fast PWN Mode: 
+Timer/Counter0 consists of 3 registers:
+- Timer/Counter 0 register:			TCNT0
+- Output Compare Register 0:		OCR0
+- Timer/Counter Control Register 0: TCCR0
+
+Most basic way to use: Write value to TCNT0 and let it
+count up to max value 
+-> Timer/Counter Overflow 0 (TOV0) is set
+-> Detect:	manually: section 5.4.4
+			generate interrupt 5.4.3
+-> Elapsed time: Page ...
+
+The exact behavior of Timer/Counter0 depends on its mode of operation 
+(see Section 5.4.4), which is controlled by setting TCCR0 (see Section 5.4.5).
+
+Enable TOV0 and OCF0 as interrupt by configuring 
+Timer/Counter Interrupt Mask Register TIMSK
+
+OCF0 and TOV0 flags are masked by OCIE0 and TOIE0 bits, respectively, in TIMSK
+OCIE0 and TOIE bits must be set to 1 to enable these interrupts
+
+Format of TCCR0: page 163
+Set up TCCR0 with not prescale: CS02 = CS01 = 0; CS00 = 1
+Set up Fast PWM mode: WGM01 = 1; WGM00 = 1, 
+
+COMM01 and COMM00: See page 164
+FOC0: See page 164
+
+
+
+Fast PWM: (page 161)
+- TCNT0 counts up from BOTTOM(0x00) to MAX (0xFF) then restarts at BOTTOM
+For a non-inverted PWM output, OC0 signal is set to 0 when TCNT0 and OCR0 match,
+and is set to 1 when the computer transitions from 0xFF to 0x00.
+
