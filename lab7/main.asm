@@ -15,6 +15,7 @@
 
 .include "m128def.inc"			; Include definition file
 
+
 ;***********************************************************
 ;*	Internal Register Definitions
 ;***********************************************************
@@ -73,6 +74,9 @@
 .org	$0008	; INT3
 		rjmp	SetMinSpeed
 		reti
+.org	$0018	; Timer/Counter1 compare match A
+		rjmp	IncTime
+		reti
 
 ; Timer Interrupt Vectors
 ; See page 23, AVR Starter Guide
@@ -120,17 +124,30 @@ INIT:
 		out		TCCR0, A
 		ldi		A, 0b01101001
 		out		TCCR2, A
-								
+		ldi		timeCount, 0
+		;rcall	LCDInit
+		;rcall	LCDClear					
 
 	; Initialize TekBot Forward Movement
 		ldi		mpr, MovFwd						; Load Move Forward Command
 		out		PORTB, mpr						; Send command to motors
 		
 	; Set initial speed, display on Port B pins 3:0
-		ldi		speed, 0
-		ldi		mpr, 0
+		ldi		speed, 4
+		ldi		mpr, 68
 		out		OCR0, mpr ;start stopped, duty cycle at 0%
 		out		OCR2, mpr
+	; Configure 16-Bit Timer/Counter1
+		ldi		mpr, (1<<CS12) ;initialize timer1 with pre-scale 256
+		out		TCCR1B, mpr
+		ldi		mpr, high(62500)
+		out		OCR1AH, mpr
+		ldi		mpr, low(62500)
+		out		OCR1AL, mpr
+		ldi		mpr, 0
+		out		TCNT1H, mpr
+		out		TCNT1L, mpr
+		
 	; Enable global interrupts (if any are used)
 
 	; Challenge: add seconds-since-last-change counter
@@ -184,9 +201,9 @@ INIT:
 ;*	Main Program
 ;***********************************************************
 MAIN:
-		;mov		mpr, speed
-		;ori		mpr, MovFwd
-		;out		PORTB, mpr
+		mov		mpr, speed
+		ori		mpr, MovFwd
+		out		PORTB, mpr
 		rjmp	MAIN			; return to top of MAIN
 
 ;***********************************************************
@@ -318,6 +335,13 @@ SetMinSpeed:
 		ret						; End a function with RET
 
 
+IncTime:
+		ldi A, 0
+		out	TCNT1H, A
+		out	TCNT1L, A
+		inc timeCount
+		ret
+
 Wait5ms:						; this function exists because of debouncing being annoying
 		push mpr
 		in mpr, SREG
@@ -340,6 +364,7 @@ WaitLoop2:
 		pop mpr
 		out SREG, mpr
 		pop mpr
+		ret
 ;***********************************************************
 ;*	Stored Program Data
 ;***********************************************************
@@ -348,3 +373,5 @@ WaitLoop2:
 ;***********************************************************
 ;*	Additional Program Includes
 ;***********************************************************
+
+;.include "LCDDriver.asm"
