@@ -26,6 +26,7 @@
 
 .def	nHits = r20				; Number of continual alternative whisker hits
 .def	hitSide = r21			; flag indicating bot was hit left the last time
+.def	buffer = r22			; buffer for received incoming data frame
 
 ;***********************************************************
 ;*	Constants
@@ -48,8 +49,10 @@
 								; (can be the first time the bot startup,
 								; or after the bot just turned around
 
+
 ; USARTs
-.equ	BotAddress = 0b00011001 ;(Enter your robot's address here (8 bits))
+.equ	ThisBotAddress = 0b00011001 ; This bot's address
+.equ	ExectingData = 1		; 1: execpting next package as a data frame; 0: ignore all data
 
 ;/////////////////////////////////////////////////////////////
 ;These macros are the values to make the TekBot Move.
@@ -275,8 +278,60 @@ TurnRight:
 ;*	USART1_RXC
 ;***********************************************************
 USART1_RXC:
+		; push stack
+		push	mpr				; Save mpr register
+		push	waitcnt			; Save wait register
+		in		mpr, SREG		; Save program state
+		push	mpr				;
+
+		; is this address or data?
+		cpi		UDR17, 0		; if the MSB is 0
+		breq	RECEIVE_ADDRESS ; receive address
+		rjmp	RECEIVE_DATA	; otherwise, receive data
+
+RECEIVE_ADDRESS:
+		; if it's an address (start with 0)
+		;	if address match
+		;		turn on the expect_data flag
+		cp		ThisBotAddress, UDR17
+		breq	START_EXPECTING_DATA
+		rjmp	END
+
+START_EXPECTING_DATA:
+		ldi		ExectingData, 1	; turn on the expect_data flag
+		rjmp	END
+
+RECEIVE_DATA:
+		; if it's an data frame	
+		;	if expect_data is set
+		
+		;		execute command
+		;		turn off expect_data flag
+
+		; if flag is set
+		cpi		ExectingData, 1	
+		breq	LOOK_UP_COMMAND
+		rjmp	END
+
+LOOK_UP_COMMAND:
+		
+		; look up commannd
+
+		; do something with data
+		in		buffer, UDR1	; put received data to buffer
+		
+		; turn off expect_data flag
+		ldi		ExectingData, 0
+
 	
-	ret
+END:
+		; pop stack
+		pop		mpr		; Restore program state
+		out		SREG, mpr	;
+		pop		waitcnt		; Restore wait register
+		pop		mpr		; Restore mpr
+
+		ret
 
 ;-----------------------------------------------------------
 ; Func: Wait(waitcnt)
