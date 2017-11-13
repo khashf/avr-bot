@@ -275,7 +275,7 @@ SetMaxSpeed:
 		ldi		speed, 15
 		ldi		mpr, 255
 		out		OCR0, mpr
-		;out		OCR2, mpr
+		out		OCR2, mpr
 
 		mov		mpr, speed
 		ori		mpr, MovFwd
@@ -303,7 +303,7 @@ SetMinSpeed:
 		ldi		speed, 0
 		ldi		mpr, 0
 		out		OCR0, mpr
-		;out		OCR2, mpr
+		out		OCR2, mpr
 
 		mov		mpr, speed
 		ori		mpr, MovFwd
