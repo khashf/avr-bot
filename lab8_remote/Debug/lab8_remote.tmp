@@ -1,0 +1,28 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.6</VERSION>
+ <DEVICE>"ATmega128"</DEVICE>
+ <WORKING_DIR>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8\Debug\lab8_remote.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>lab8_remote.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>lab8_remote.map</FILE>
+  <FILE>lab8_remote.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <INIT><FILE>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8\main.asm</FILE><LINE>52</LINE></INIT>
+  <MAIN><FILE>C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8\main.asm</FILE><LINE>78</LINE></MAIN>
+ </LABELS>
+</ASSEMBLER_INFO>
