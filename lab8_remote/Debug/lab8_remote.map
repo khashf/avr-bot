@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.6  C:\Users\Trevor\Stuff\School\Fall 2017\ECE 375\Lab\avr-bot-master\avr-bot-master\lab8\main.asm Mon Nov 13 12:55:52 2017
+AVRASM ver. 2.2.6  D:\win_dev\avr-bot\lab8_remote\main.asm Sat Nov 18 22:17:51 2017
 
 
 EQU  SIGNATURE_000 0000001e
@@ -868,6 +868,15 @@ EQU  TWIaddr      00000042
 EQU  SPMRaddr     00000044
 EQU  INT_VECTORS_SIZE 00000046
 DEF  mpr          r16
+DEF  sendcode     r17
+DEF  lastpress    r18
+DEF  command      r19
+EQU  Button0      00000000
+EQU  Button1      00000001
+EQU  Button2      00000002
+EQU  Button3      00000004
+EQU  Button4      00000005
+EQU  Button5      00000006
 EQU  EngEnR       00000004
 EQU  EngEnL       00000007
 EQU  EngDirR      00000005
@@ -877,5 +886,22 @@ EQU  MovBck       00000080
 EQU  TurnR        000000a0
 EQU  TurnL        00000090
 EQU  Halt         000000c8
+EQU  Freeze       000000f8
+EQU  BotAddress   00000019
 CSEG INIT         00000046
-CSEG MAIN         00000059
+CSEG MAIN         00000061
+CSEG PollForInput 00000063
+CSEG Next7        00000080
+CSEG Next1        0000006d
+CSEG SendMovFwd   00000082
+CSEG Next2        00000071
+CSEG SendMovBck   00000085
+CSEG Next3        00000075
+CSEG SendTurnR    00000088
+CSEG Next4        00000079
+CSEG SendTurnL    0000008b
+CSEG Next5        0000007d
+CSEG SendHalt     0000008e
+CSEG SendFreeze   00000091
+CSEG USART1_Transmit_Command 00000094
+CSEG USART1_Transmit 00000099
