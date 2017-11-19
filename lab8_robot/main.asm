@@ -27,7 +27,7 @@
 .def	nHits = r20				; Number of continual alternative whisker hits
 .def	hitSide = r21			; flag indicating bot was hit left the last time
 .def	buffer = r22			; buffer for received incoming data frame
-
+.def	ExpectingData = r23
 ;***********************************************************
 ;*	Constants
 ;***********************************************************
@@ -52,7 +52,6 @@
 
 ; USARTs
 .equ	ThisBotAddress = 0b00011001 ; This bot's address
-.equ	ExectingData = 1		; 1: execpting next package as a data frame; 0: ignore all data
 
 ;/////////////////////////////////////////////////////////////
 ;These macros are the values to make the TekBot Move.
@@ -62,6 +61,12 @@
 .equ	TurnR =   (1<<EngDirL)				;0b01000000 Turn Right Action Code
 .equ	TurnL =   (1<<EngDirR)				;0b00100000 Turn Left Action Code
 .equ	Halt =    (1<<EngEnR|1<<EngEnL)		;0b10010000 Halt Action Code
+
+.equ	MovFwdCmd =  ($80|1<<(EngDirR-1)|1<<(EngDirL-1))	;0b01100000 Move Forward Action Code
+.equ	MovBckCmd =  ($80|$00)						;0b00000000 Move Backward Action Code
+.equ	TurnRCmd =   ($80|1<<(EngDirL-1))				;0b01000000 Turn Right Action Code
+.equ	TurnLCmd =   ($80|1<<(EngDirR-1))				;0b00100000 Turn Left Action Code
+.equ	HaltCmd =    ($80|1<<(EngEnR-1)|1<<(EngEnL-1))		;0b10010000 Halt Action Code
 
 ;***********************************************************
 ;*	Start of Code Segment
@@ -109,6 +114,7 @@ INIT:
 	; Initialize Turn-around behavior Flags
 		ldi		nHits, 0						; 
 		ldi		hitSide, WasNeither
+		ldi		ExpectingData, 0
 	; USART1
 		; Set asynchronous normal mode
 		ldi		mpr, 0 
@@ -119,7 +125,7 @@ INIT:
 		ldi		mpr, low(416)
 		sts		UBRR1L, mpr
 		; Enable receiver and enable receive interrupts
-		ldi		mpr, (1<<RXEN1|1<<RXCIE1)
+		ldi		mpr, (1<<RXEN1);|(1<<RXCIE1)
 		sts		UCSR1B, mpr
 		; Set frame format: 8 data bits, 2 stop bits
 		ldi		mpr, (1<<USBS1|1<<UCSZ11|1<<UCSZ10)
@@ -138,9 +144,33 @@ INIT:
 ;*	Main Program
 ;***********************************************************
 MAIN:
-		ldi		mpr, MovFwd		; the bot always move forward by default when not turning
-		out		PORTB, mpr		; 
+		rcall PollReceive
+		;ldi		mpr, MovFwd		; the bot always move forward by default when not turning
+		;out		PORTB, mpr		; 
 		rjmp	MAIN
+
+PollReceive:
+		ldi XH, high(UCSR1A)
+		ldi	XL, low(UCSR1A)
+		ld mpr, X
+		sbrs mpr, RXC1
+		rjmp PollReceive
+		ldi XH, high(UDR1)
+		ldi XL, low(UDR1)
+		ld mpr, X
+		out		PORTB, mpr
+		ret
+		
+		/*sbrs mpr, RXC1
+		rjmp PollReceive
+		ldi		mpr, 1
+		out		PORTB, mpr
+
+		ldi XH, high(UDR1)
+		ldi	XL, low(UDR1)
+		ld	mpr, X
+		out PORTB, mpr
+		ret*/
 
 ;-----------------------------------------------------------
 ; Func: HitRight()
@@ -285,20 +315,34 @@ USART1_RXC:
 		push	mpr				;
 
 		; is this address or data?
-		cpi		UDR17, 0		; if the MSB is 0
-		breq	RECEIVE_ADDRESS ; receive address
+ReceiveLoop:
+		ldi		XH, high(UCSR1A)
+		ldi		XL, low(UCSR1A)
+		ld		mpr, X
+		sbrs	mpr, RXC1
+		rjmp ReceiveLoop
+
+
+		ldi		XH, high(UDR1)
+		ldi		XL, low(UDR1)
+		ld      mpr, X
+		;out     PORTB, mpr
+		;rjmp	END
+		sbrs	mpr, UDR17		; check the MSB
+		rjmp	RECEIVE_ADDRESS ; receive address
 		rjmp	RECEIVE_DATA	; otherwise, receive data
 
 RECEIVE_ADDRESS:
 		; if it's an address (start with 0)
 		;	if address match
 		;		turn on the expect_data flag
-		cp		ThisBotAddress, UDR17
+		cpi		mpr, ThisBotAddress
+		;out		PORTB, mpr
 		breq	START_EXPECTING_DATA
 		rjmp	END
 
 START_EXPECTING_DATA:
-		ldi		ExectingData, 1	; turn on the expect_data flag
+		ldi		ExpectingData, 1	; turn on the expect_data flag
 		rjmp	END
 
 RECEIVE_DATA:
@@ -309,7 +353,7 @@ RECEIVE_DATA:
 		;		turn off expect_data flag
 
 		; if flag is set
-		cpi		ExectingData, 1	
+		cpi		ExpectingData, 1	
 		breq	LOOK_UP_COMMAND
 		rjmp	END
 
@@ -318,18 +362,57 @@ LOOK_UP_COMMAND:
 		; look up commannd
 
 		; do something with data
-		in		buffer, UDR1	; put received data to buffer
-		
-		; turn off expect_data flag
-		ldi		ExectingData, 0
+		mov		buffer, mpr ;mpr already contains the 
 
-	
+		; turn off expect_data flag
+		ldi		ExpectingData, 0
+
+		; compare with each address
+		cpi		buffer, TurnLCmd
+		breq	GoLeft
+		cpi		buffer, TurnRCmd
+		breq	GoRight
+		cpi		buffer, MovFwdCmd
+		breq	GoForward
+		cpi		buffer, MovBckCmd
+		breq	GoBackward
+		cpi		buffer, HaltCmd
+		breq	SetHalt
+		rjmp	END
+
+GoLeft:
+		ldi		mpr, TurnL
+		out		PORTB, mpr
+		rjmp	END
+
+GoRight:
+		ldi		mpr, TurnR
+		out		PORTB, mpr
+		rjmp	END
+
+GoForward:
+		ldi		mpr, MovFwd
+		out		PORTB, mpr
+		rjmp	END
+
+GoBackward:
+		ldi		mpr, MovBck
+		out		PORTB, mpr
+		rjmp	END
+
+SetHalt:
+		ldi		mpr, Halt
+		out		PORTB, mpr
+		rjmp	END
+
 END:
 		; pop stack
 		pop		mpr		; Restore program state
 		out		SREG, mpr	;
 		pop		waitcnt		; Restore wait register
 		pop		mpr		; Restore mpr
+		; set global interrupt back		
+		sei
 
 		ret
 

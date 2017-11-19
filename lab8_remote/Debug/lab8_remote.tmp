@@ -1,18 +1,18 @@
 <ASSEMBLER_INFO>
  <VERSION>2.2.6</VERSION>
  <DEVICE>"ATmega128"</DEVICE>
- <WORKING_DIR>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_remote\Debug</WORKING_DIR>
+ <WORKING_DIR>D:\win_dev\avr-bot\lab8_remote\Debug</WORKING_DIR>
  <INCLUDE_PATH>
   <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc</DIR>
   <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
   <DIR></DIR>
  </INCLUDE_PATH>
- <SOURCE_FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_remote\main.asm</SOURCE_FILE>
+ <SOURCE_FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</SOURCE_FILE>
  <INCLUDED_FILES>
   <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc</FILE>
  </INCLUDED_FILES>
  <OBJECT_FILES>
-  <FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_remote\Debug\lab8_remote.obj</FILE>
+  <FILE>D:\win_dev\avr-bot\lab8_remote\Debug\lab8_remote.obj</FILE>
  </OBJECT_FILES>
  <HEX_FILES>
   <FILE>lab8_remote.hex</FILE>
@@ -22,7 +22,22 @@
   <FILE>lab8_remote.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <INIT><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_remote\main.asm</FILE><LINE>52</LINE></INIT>
-  <MAIN><FILE>\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_remote\main.asm</FILE><LINE>78</LINE></MAIN>
+  <INIT><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>64</LINE></INIT>
+  <MAIN><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>101</LINE></MAIN>
+  <PollForInput><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>108</LINE></PollForInput>
+  <Next7><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>143</LINE></Next7>
+  <Next1><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>119</LINE></Next1>
+  <SendMovFwd><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>149</LINE></SendMovFwd>
+  <Next2><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>124</LINE></Next2>
+  <SendMovBck><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>155</LINE></SendMovBck>
+  <Next3><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>129</LINE></Next3>
+  <SendTurnR><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>161</LINE></SendTurnR>
+  <Next4><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>134</LINE></Next4>
+  <SendTurnL><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>167</LINE></SendTurnL>
+  <Next5><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>139</LINE></Next5>
+  <SendHalt><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>173</LINE></SendHalt>
+  <SendFreeze><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>179</LINE></SendFreeze>
+  <USART1_Transmit_Command><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>185</LINE></USART1_Transmit_Command>
+  <USART1_Transmit><FILE>D:\win_dev\avr-bot\lab8_remote\main.asm</FILE><LINE>191</LINE></USART1_Transmit>
  </LABELS>
 </ASSEMBLER_INFO>

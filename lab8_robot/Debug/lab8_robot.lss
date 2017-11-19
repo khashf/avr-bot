@@ -1,10 +1,10 @@
 
-AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm Mon Nov 13 13:12:40 2017
+AVRASM ver. 2.2.6  D:\win_dev\avr-bot\lab8_robot\main.asm Sat Nov 18 22:17:51 2017
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
-\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm(16): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
+D:\win_dev\avr-bot\lab8_robot\main.asm(16): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
-\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_robot\main.asm(16): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
+D:\win_dev\avr-bot\lab8_robot\main.asm(16): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
                                  
                                  ;***********************************************************
                                  
@@ -1295,7 +1295,8 @@ AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\De
                                  
                                  .def	nHits = r20				; Number of continual alternative whisker hits
                                  .def	hitSide = r21			; flag indicating bot was hit left the last time
-                                 
+                                 .def	buffer = r22			; buffer for received incoming data frame
+                                 .def	ExpectingData = r23
                                  ;***********************************************************
                                  ;*	Constants
                                  ;***********************************************************
@@ -1317,8 +1318,9 @@ AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\De
                                  								; (can be the first time the bot startup,
                                  								; or after the bot just turned around
                                  
+                                 
                                  ; USARTs
-                                 .equ	BotAddress = 0b00011001 ;(Enter your robot's address here (8 bits))
+                                 .equ	ThisBotAddress = 0b00011001 ; This bot's address
                                  
                                  ;/////////////////////////////////////////////////////////////
                                  ;These macros are the values to make the TekBot Move.
@@ -1328,6 +1330,12 @@ AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\De
                                  .equ	TurnR =   (1<<EngDirL)				;0b01000000 Turn Right Action Code
                                  .equ	TurnL =   (1<<EngDirR)				;0b00100000 Turn Left Action Code
                                  .equ	Halt =    (1<<EngEnR|1<<EngEnL)		;0b10010000 Halt Action Code
+                                 
+                                 .equ	MovFwdCmd =  ($80|1<<(EngDirR-1)|1<<(EngDirL-1))	;0b01100000 Move Forward Action Code
+                                 .equ	MovBckCmd =  ($80|$00)						;0b00000000 Move Backward Action Code
+                                 .equ	TurnRCmd =   ($80|1<<(EngDirL-1))				;0b01000000 Turn Right Action Code
+                                 .equ	TurnLCmd =   ($80|1<<(EngDirR-1))				;0b00100000 Turn Left Action Code
+                                 .equ	HaltCmd =    ($80|1<<(EngEnR-1)|1<<(EngEnL-1))		;0b10010000 Halt Action Code
                                  
                                  ;***********************************************************
                                  ;*	Start of Code Segment
@@ -1340,13 +1348,13 @@ AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\De
                                  .org	$0000					; Beginning of IVs
 000000 c045                      		rjmp 	INIT			; Reset interrupt
                                  .org	$0002
-000002 c06b                      		rjmp	HitRight
+000002 c075                      		rjmp	HitRight
 000003 9518                      		reti
                                  .org	$0004
-000004 c08c                      		rjmp	HitLeft
+000004 c096                      		rjmp	HitLeft
 000005 9518                      		reti
                                  .org	$003C					;USART1, Rx complete
-00003c c077                      		rjmp	USART1_RXC
+00003c c081                      		rjmp	USART1_RXC
 00003d 9518                      		reti
                                  .org	$0046					; End of Interrupt Vectors
                                  
@@ -1375,38 +1383,63 @@ AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\De
                                  	; Initialize Turn-around behavior Flags
 000054 e040                      		ldi		nHits, 0						; 
 000055 e052                      		ldi		hitSide, WasNeither
+000056 e070                      		ldi		ExpectingData, 0
                                  	; USART1
                                  		; Set asynchronous normal mode
-000056 e000                      		ldi		mpr, 0 
-000057 9300 009b                 		sts		UCSR1A, mpr
+000057 e000                      		ldi		mpr, 0 
+000058 9300 009b                 		sts		UCSR1A, mpr
                                  		; Set baudrate at 2400bps, UBRR = 416
-000059 e001                      		ldi		mpr, high(416)
-00005a 9300 0098                 		sts		UBRR1H, mpr
-00005c ea00                      		ldi		mpr, low(416)
-00005d 9300 0099                 		sts		UBRR1L, mpr
+00005a e001                      		ldi		mpr, high(416)
+00005b 9300 0098                 		sts		UBRR1H, mpr
+00005d ea00                      		ldi		mpr, low(416)
+00005e 9300 0099                 		sts		UBRR1L, mpr
                                  		; Enable receiver and enable receive interrupts
-00005f e900                      		ldi		mpr, (1<<RXEN1|1<<RXCIE1)
-000060 9300 009a                 		sts		UCSR1B, mpr
+000060 e100                      		ldi		mpr, (1<<RXEN1);|(1<<RXCIE1)
+000061 9300 009a                 		sts		UCSR1B, mpr
                                  		; Set frame format: 8 data bits, 2 stop bits
-000062 e00e                      		ldi		mpr, (1<<USBS1|1<<UCSZ11|1<<UCSZ10)
-000063 9300 009d                 		sts		UCSR1C, mpr
+000063 e00e                      		ldi		mpr, (1<<USBS1|1<<UCSZ11|1<<UCSZ10)
+000064 9300 009d                 		sts		UCSR1C, mpr
                                  	; Initialize external interrupts
                                  		; Set the Interrupt Sense Control to falling edge
-000065 e00a                      		ldi		mpr, (1<<ISC01)|(0<<ISC00)|(1<<ISC11)|(0<<ISC10)
-000066 9300 006a                 		sts		EICRA, mpr
+000066 e00a                      		ldi		mpr, (1<<ISC01)|(0<<ISC00)|(1<<ISC11)|(0<<ISC10)
+000067 9300 006a                 		sts		EICRA, mpr
                                  		; Configure the External Interrupt Mask
-000068 e003                      		ldi		mpr, (1<<INT0|1<<INT1)
-000069 bf09                      		out		EIMSK, mpr
+000069 e003                      		ldi		mpr, (1<<INT0|1<<INT1)
+00006a bf09                      		out		EIMSK, mpr
                                  		; Turn on interrupts
-00006a 9478                      		sei
+00006b 9478                      		sei
                                  
                                  ;***********************************************************
                                  ;*	Main Program
                                  ;***********************************************************
                                  MAIN:
-00006b e600                      		ldi		mpr, MovFwd		; the bot always move forward by default when not turning
-00006c bb08                      		out		PORTB, mpr		; 
-00006d cffd                      		rjmp	MAIN
+00006c d001                      		rcall PollReceive
+                                 		;ldi		mpr, MovFwd		; the bot always move forward by default when not turning
+                                 		;out		PORTB, mpr		; 
+00006d cffe                      		rjmp	MAIN
+                                 
+                                 PollReceive:
+00006e e0b0                      		ldi XH, high(UCSR1A)
+00006f e9ab                      		ldi	XL, low(UCSR1A)
+000070 910c                      		ld mpr, X
+000071 ff07                      		sbrs mpr, RXC1
+000072 cffb                      		rjmp PollReceive
+000073 e0b0                      		ldi XH, high(UDR1)
+000074 e9ac                      		ldi XL, low(UDR1)
+000075 910c                      		ld mpr, X
+000076 bb08                      		out		PORTB, mpr
+000077 9508                      		ret
+                                 		
+                                 		/*sbrs mpr, RXC1
+                                 		rjmp PollReceive
+                                 		ldi		mpr, 1
+                                 		out		PORTB, mpr
+                                 
+                                 		ldi XH, high(UDR1)
+                                 		ldi	XL, low(UDR1)
+                                 		ld	mpr, X
+                                 		out PORTB, mpr
+                                 		ret*/
                                  
                                  ;-----------------------------------------------------------
                                  ; Func: HitRight()
@@ -1415,64 +1448,64 @@ AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\De
                                  ;-----------------------------------------------------------
                                  HitRight:							; Begin a function with a label
                                  		; Clear interrupt and disable interrupts
-00006e 94f8                      		cli							; clear I-bit in SREG
-00006f e000                      		ldi		mpr, (0<<INT0|0<<INT1) ; clear corresponding bit
-000070 bf09                      		out		EIMSK, mpr			; in EIMSK register
-000071 bf08                      		out		EIFR, mpr			; in EIFR register
+000078 94f8                      		cli							; clear I-bit in SREG
+000079 e000                      		ldi		mpr, (0<<INT0|0<<INT1) ; clear corresponding bit
+00007a bf09                      		out		EIMSK, mpr			; in EIMSK register
+00007b bf08                      		out		EIFR, mpr			; in EIFR register
                                  
                                  		; Move back
-000072 e000                      		ldi		mpr, MovBck
-000073 bb08                      		out		PORTB, mpr
+00007c e000                      		ldi		mpr, MovBck
+00007d bb08                      		out		PORTB, mpr
                                  
                                  		; Wait <waitcnt> secs
-000074 e614                      		ldi		waitcnt, ReverseTime
-000075 d03f                      		rcall	Wait
+00007e e614                      		ldi		waitcnt, ReverseTime
+00007f d077                      		rcall	Wait
                                  
                                  		; If (this's an alternating turn or is the first time)
-000076 3052                      		cpi		hitSide, WasNeither
-000077 f021                      		breq	CountAltTurnRight	; count hit
-000078 3050                      		cpi		hitSide, WasHitLeft
-000079 f011                      		breq	CountAltTurnRight	; count hit
+000080 3052                      		cpi		hitSide, WasNeither
+000081 f021                      		breq	CountAltTurnRight	; count hit
+000082 3050                      		cpi		hitSide, WasHitLeft
+000083 f011                      		breq	CountAltTurnRight	; count hit
                                  		; Else (same side)
-00007a e041                      		ldi		nHits, 1			; lose the streak => lose streak
-00007b c008                      		rjmp	SetTurnLeftTime		; set up time to turn left
+000084 e041                      		ldi		nHits, 1			; lose the streak => lose streak
+000085 c008                      		rjmp	SetTurnLeftTime		; set up time to turn left
                                  
                                  CountAltTurnRight:
-00007c 9543                      		inc		nHits				; count up this hit
+000086 9543                      		inc		nHits				; count up this hit
                                  		; If (this is the 6th alternating hit)
-00007d 3046                      		cpi		nHits, 6
-00007e f009                      		breq	SetTurnAroundTimeInLeft		; set up time to turn around
+000087 3046                      		cpi		nHits, 6
+000088 f009                      		breq	SetTurnAroundTimeInLeft		; set up time to turn around
                                  		; Else
-00007f c004                      		rjmp	SetTurnLeftTime
+000089 c004                      		rjmp	SetTurnLeftTime
                                  		
                                  SetTurnAroundTimeInLeft:
-000080 e040                      		ldi		nHits, 0			; reset nHits to 0 
-000081 ec18                      		ldi		waitcnt, TurnAroundTime
-000082 e052                      		ldi		hitSide, WasNeither
-000083 c003                      		rjmp	TurnLeft
+00008a e040                      		ldi		nHits, 0			; reset nHits to 0 
+00008b ec18                      		ldi		waitcnt, TurnAroundTime
+00008c e052                      		ldi		hitSide, WasNeither
+00008d c003                      		rjmp	TurnLeft
                                  
                                  SetTurnLeftTime:
-000084 e614                      		ldi		waitcnt, TurnLeftTime
-000085 e051                      		ldi		hitSide, WasHitRight
-000086 c000                      		rjmp	TurnLeft
+00008e e614                      		ldi		waitcnt, TurnLeftTime
+00008f e051                      		ldi		hitSide, WasHitRight
+000090 c000                      		rjmp	TurnLeft
                                  
                                  TurnLeft:
                                  		; Turn
-000087 e200                      		ldi mpr, TurnL
-000088 bb08                      		out PORTB, mpr
-000089 d02b                      		rcall Wait
+000091 e200                      		ldi mpr, TurnL
+000092 bb08                      		out PORTB, mpr
+000093 d063                      		rcall Wait
                                  
                                  		; Reset input
-00008a 9891                      		cbi PORTD, WskrL
-00008b 9890                      		cbi PORTD, WskrR
+000094 9891                      		cbi PORTD, WskrL
+000095 9890                      		cbi PORTD, WskrR
                                  
                                  		; Set interrupt back and start listen for interrupt
-00008c e003                      		ldi		mpr, (1<<INT0|1<<INT1)
-00008d bf09                      		out		EIMSK, mpr			; in EIMSK register
-00008e bf08                      		out		EIFR, mpr			; in EIFR register
-00008f 9478                      		sei							; set I-bit in SREG
+000096 e003                      		ldi		mpr, (1<<INT0|1<<INT1)
+000097 bf09                      		out		EIMSK, mpr			; in EIMSK register
+000098 bf08                      		out		EIFR, mpr			; in EIFR register
+000099 9478                      		sei							; set I-bit in SREG
                                  
-000090 9508                      		ret					; End a function with RET
+00009a 9508                      		ret					; End a function with RET
                                  
                                  ;-----------------------------------------------------------
                                  ; Func: HitLeft(void)
@@ -1481,71 +1514,176 @@ AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\De
                                  ;-----------------------------------------------------------
                                  HitLeft:	
                                  		; Clear interrupt and disable interrupts
-000091 94f8                      		cli							; clear I-bit in SREG
-000092 e000                      		ldi		mpr, (0<<INT0|0<<INT1)
-000093 bf09                      		out		EIMSK, mpr			; in EIMSK register
-000094 bf08                      		out		EIFR, mpr			; in EIFR register
+00009b 94f8                      		cli							; clear I-bit in SREG
+00009c e000                      		ldi		mpr, (0<<INT0|0<<INT1)
+00009d bf09                      		out		EIMSK, mpr			; in EIMSK register
+00009e bf08                      		out		EIFR, mpr			; in EIFR register
                                  
                                  		; Move back
-000095 e000                      		ldi		mpr, MovBck
-000096 bb08                      		out		PORTB, mpr
+00009f e000                      		ldi		mpr, MovBck
+0000a0 bb08                      		out		PORTB, mpr
                                  
                                  		; Wait <waitcnt> secs
-000097 e614                      		ldi		waitcnt, ReverseTime
-000098 d01c                      		rcall	Wait
+0000a1 e614                      		ldi		waitcnt, ReverseTime
+0000a2 d054                      		rcall	Wait
                                  
                                  		; If (this's an alternating turn)
-000099 3052                      		cpi		hitSide, WasNeither
-00009a f021                      		breq	CountAltTurnLeft	; count hit
-00009b 3051                      		cpi		hitSide, WasHitRight
-00009c f011                      		breq	CountAltTurnLeft	; count hit
+0000a3 3052                      		cpi		hitSide, WasNeither
+0000a4 f021                      		breq	CountAltTurnLeft	; count hit
+0000a5 3051                      		cpi		hitSide, WasHitRight
+0000a6 f011                      		breq	CountAltTurnLeft	; count hit
                                  		; Else
-00009d e041                      		ldi		nHits, 1			; reset nHits = 0 => lose the streak
-00009e c008                      		rjmp	SetTurnRightTime			; set up time to turn left
+0000a7 e041                      		ldi		nHits, 1			; reset nHits = 0 => lose the streak
+0000a8 c008                      		rjmp	SetTurnRightTime			; set up time to turn left
                                  
                                  CountAltTurnLeft:
-00009f 9543                      		inc		nHits				; count up this hit
+0000a9 9543                      		inc		nHits				; count up this hit
                                  		; If (this is the 6th alternating hit)
-0000a0 3046                      		cpi		nHits, 6
-0000a1 f009                      		breq	SetTurnAroundTimeInRight		; set up time to turn around
+0000aa 3046                      		cpi		nHits, 6
+0000ab f009                      		breq	SetTurnAroundTimeInRight		; set up time to turn around
                                  		; Else
-0000a2 c004                      		rjmp	SetTurnRightTime
+0000ac c004                      		rjmp	SetTurnRightTime
                                  		
                                  SetTurnAroundTimeInRight:
-0000a3 e040                      		ldi		nHits, 0			; reset nHits = 0 
-0000a4 ec18                      		ldi		waitcnt, TurnAroundTime
-0000a5 e052                      		ldi		hitSide, WasNeither
-0000a6 c003                      		rjmp	TurnRight
+0000ad e040                      		ldi		nHits, 0			; reset nHits = 0 
+0000ae ec18                      		ldi		waitcnt, TurnAroundTime
+0000af e052                      		ldi		hitSide, WasNeither
+0000b0 c003                      		rjmp	TurnRight
                                  
                                  SetTurnRightTime:
-0000a7 e614                      		ldi		waitcnt, TurnRightTime
-0000a8 e050                      		ldi		hitSide, WasHitLeft
-0000a9 c000                      		rjmp	TurnRight
+0000b1 e614                      		ldi		waitcnt, TurnRightTime
+0000b2 e050                      		ldi		hitSide, WasHitLeft
+0000b3 c000                      		rjmp	TurnRight
                                  
                                  TurnRight:
                                  		; Turn
-0000aa e400                      		ldi mpr, TurnR
-0000ab bb08                      		out PORTB, mpr
-0000ac d008                      		rcall Wait
+0000b4 e400                      		ldi mpr, TurnR
+0000b5 bb08                      		out PORTB, mpr
+0000b6 d040                      		rcall Wait
                                  
                                  		; Reset input
-0000ad 9891                      		cbi PORTD, WskrL
-0000ae 9890                      		cbi PORTD, WskrR
+0000b7 9891                      		cbi PORTD, WskrL
+0000b8 9890                      		cbi PORTD, WskrR
                                  
                                  		; Set interrupt back and start listen for interrupt
-0000af e003                      		ldi		mpr, (1<<INT0|1<<INT1)
-0000b0 bf09                      		out		EIMSK, mpr			; in EIMSK register
-0000b1 bf08                      		out		EIFR, mpr			; in EIFR register
-0000b2 9478                      		sei							; set I-bit in SREG
+0000b9 e003                      		ldi		mpr, (1<<INT0|1<<INT1)
+0000ba bf09                      		out		EIMSK, mpr			; in EIMSK register
+0000bb bf08                      		out		EIFR, mpr			; in EIFR register
+0000bc 9478                      		sei							; set I-bit in SREG
                                  
-0000b3 9508                      		ret					; End a function with RET
+0000bd 9508                      		ret					; End a function with RET
                                  
                                  ;***********************************************************
                                  ;*	USART1_RXC
                                  ;***********************************************************
                                  USART1_RXC:
-                                 	
-0000b4 9508                      	ret
+                                 		; push stack
+0000be 930f                      		push	mpr				; Save mpr register
+0000bf 931f                      		push	waitcnt			; Save wait register
+0000c0 b70f                      		in		mpr, SREG		; Save program state
+0000c1 930f                      		push	mpr				;
+                                 
+                                 		; is this address or data?
+                                 ReceiveLoop:
+0000c2 e0b0                      		ldi		XH, high(UCSR1A)
+0000c3 e9ab                      		ldi		XL, low(UCSR1A)
+0000c4 910c                      		ld		mpr, X
+0000c5 ff07                      		sbrs	mpr, RXC1
+0000c6 cffb                      		rjmp ReceiveLoop
+                                 
+                                 
+0000c7 e0b0                      		ldi		XH, high(UDR1)
+0000c8 e9ac                      		ldi		XL, low(UDR1)
+0000c9 910c                      		ld      mpr, X
+                                 		;out     PORTB, mpr
+                                 		;rjmp	END
+0000ca ff07                      		sbrs	mpr, UDR17		; check the MSB
+0000cb c001                      		rjmp	RECEIVE_ADDRESS ; receive address
+0000cc c005                      		rjmp	RECEIVE_DATA	; otherwise, receive data
+                                 
+                                 RECEIVE_ADDRESS:
+                                 		; if it's an address (start with 0)
+                                 		;	if address match
+                                 		;		turn on the expect_data flag
+0000cd 3109                      		cpi		mpr, ThisBotAddress
+                                 		;out		PORTB, mpr
+0000ce f009                      		breq	START_EXPECTING_DATA
+0000cf c021                      		rjmp	END
+                                 
+                                 START_EXPECTING_DATA:
+0000d0 e071                      		ldi		ExpectingData, 1	; turn on the expect_data flag
+0000d1 c01f                      		rjmp	END
+                                 
+                                 RECEIVE_DATA:
+                                 		; if it's an data frame	
+                                 		;	if expect_data is set
+                                 		
+                                 		;		execute command
+                                 		;		turn off expect_data flag
+                                 
+                                 		; if flag is set
+0000d2 3071                      		cpi		ExpectingData, 1	
+0000d3 f009                      		breq	LOOK_UP_COMMAND
+0000d4 c01c                      		rjmp	END
+                                 
+                                 LOOK_UP_COMMAND:
+                                 		
+                                 		; look up commannd
+                                 
+                                 		; do something with data
+0000d5 2f60                      		mov		buffer, mpr ;mpr already contains the 
+                                 
+                                 		; turn off expect_data flag
+0000d6 e070                      		ldi		ExpectingData, 0
+                                 
+                                 		; compare with each address
+0000d7 3960                      		cpi		buffer, TurnLCmd
+0000d8 f049                      		breq	GoLeft
+0000d9 3a60                      		cpi		buffer, TurnRCmd
+0000da f051                      		breq	GoRight
+0000db 3b60                      		cpi		buffer, MovFwdCmd
+0000dc f059                      		breq	GoForward
+0000dd 3860                      		cpi		buffer, MovBckCmd
+0000de f061                      		breq	GoBackward
+0000df 3c68                      		cpi		buffer, HaltCmd
+0000e0 f069                      		breq	SetHalt
+0000e1 c00f                      		rjmp	END
+                                 
+                                 GoLeft:
+0000e2 e200                      		ldi		mpr, TurnL
+0000e3 bb08                      		out		PORTB, mpr
+0000e4 c00c                      		rjmp	END
+                                 
+                                 GoRight:
+0000e5 e400                      		ldi		mpr, TurnR
+0000e6 bb08                      		out		PORTB, mpr
+0000e7 c009                      		rjmp	END
+                                 
+                                 GoForward:
+0000e8 e600                      		ldi		mpr, MovFwd
+0000e9 bb08                      		out		PORTB, mpr
+0000ea c006                      		rjmp	END
+                                 
+                                 GoBackward:
+0000eb e000                      		ldi		mpr, MovBck
+0000ec bb08                      		out		PORTB, mpr
+0000ed c003                      		rjmp	END
+                                 
+                                 SetHalt:
+0000ee e900                      		ldi		mpr, Halt
+0000ef bb08                      		out		PORTB, mpr
+0000f0 c000                      		rjmp	END
+                                 
+                                 END:
+                                 		; pop stack
+0000f1 910f                      		pop		mpr		; Restore program state
+0000f2 bf0f                      		out		SREG, mpr	;
+0000f3 911f                      		pop		waitcnt		; Restore wait register
+0000f4 910f                      		pop		mpr		; Restore mpr
+                                 		; set global interrupt back		
+0000f5 9478                      		sei
+                                 
+0000f6 9508                      		ret
                                  
                                  ;-----------------------------------------------------------
                                  ; Func: Wait(waitcnt)
@@ -1553,23 +1691,23 @@ AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\De
                                  ;		
                                  ;-----------------------------------------------------------
                                  Wait:
-0000b5 931f                      		push	waitcnt			; Save wait register
-0000b6 932f                      		push	ilcnt			; Save ilcnt register
-0000b7 933f                      		push	olcnt			; Save olcnt register
+0000f7 931f                      		push	waitcnt			; Save wait register
+0000f8 932f                      		push	ilcnt			; Save ilcnt register
+0000f9 933f                      		push	olcnt			; Save olcnt register
                                  
-0000b8 ee30                      Loop:	ldi		olcnt, 224		; load olcnt register
-0000b9 ee2d                      OLoop:	ldi		ilcnt, 237		; load ilcnt register
-0000ba 952a                      ILoop:	dec		ilcnt			; decrement ilcnt
-0000bb f7f1                      		brne	ILoop			; Continue Inner Loop
-0000bc 953a                      		dec		olcnt		; decrement olcnt
-0000bd f7d9                      		brne	OLoop			; Continue Outer Loop
-0000be 951a                      		dec		waitcnt		; Decrement wait 
-0000bf f7c1                      		brne	Loop			; Continue Wait loop	
+0000fa ee30                      Loop:	ldi		olcnt, 224		; load olcnt register
+0000fb ee2d                      OLoop:	ldi		ilcnt, 237		; load ilcnt register
+0000fc 952a                      ILoop:	dec		ilcnt			; decrement ilcnt
+0000fd f7f1                      		brne	ILoop			; Continue Inner Loop
+0000fe 953a                      		dec		olcnt		; decrement olcnt
+0000ff f7d9                      		brne	OLoop			; Continue Outer Loop
+000100 951a                      		dec		waitcnt		; Decrement wait 
+000101 f7c1                      		brne	Loop			; Continue Wait loop	
                                  
-0000c0 913f                      		pop		olcnt		; Restore olcnt register
-0000c1 912f                      		pop		ilcnt		; Restore ilcnt register
-0000c2 911f                      		pop		waitcnt		; Restore wait register
-0000c3 9508                      		ret				; Return from subroutine
+000102 913f                      		pop		olcnt		; Restore olcnt register
+000103 912f                      		pop		ilcnt		; Restore ilcnt register
+000104 911f                      		pop		waitcnt		; Restore wait register
+000105 9508                      		ret				; Return from subroutine
                                  
                                  ;***********************************************************
                                  ;*	Stored Program Data
@@ -1595,40 +1733,40 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega128" register use summary:
-x  :   0 y  :   0 z  :   0 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
+x  :   4 y  :   0 z  :   0 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:  50 r17:   9 r18:   4 r19:   4 r20:   9 
-r21:   9 r22:   0 r23:   0 r24:   0 r25:   0 r26:   0 r27:   0 r28:   0 
+r13:   0 r14:   0 r15:   0 r16:  74 r17:  11 r18:   4 r19:   4 r20:   9 
+r21:   9 r22:   6 r23:   4 r24:   0 r25:   0 r26:   4 r27:   4 r28:   0 
 r29:   0 r30:   0 r31:   0 
-Registers used: 6 out of 35 (17.1%)
+Registers used: 11 out of 35 (31.4%)
 
 "ATmega128" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :   6 brge  :   0 brhc  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :  13 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
 brne  :   3 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
 brvs  :   0 bset  :   0 bst   :   0 call  :   0 cbi   :   4 cbr   :   0 
 clc   :   0 clh   :   0 cli   :   2 cln   :   0 clr   :   0 cls   :   0 
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 
-cpi   :   6 cpse  :   0 dec   :   3 elpm  :   0 eor   :   0 fmul  :   0 
-fmuls :   0 fmulsu:   0 icall :   0 ijmp  :   0 in    :   0 inc   :   2 
-jmp   :   0 ld    :   0 ldd   :   0 ldi   :  41 lds   :   0 lpm   :   0 
-lsl   :   0 lsr   :   0 mov   :   0 movw  :   0 mul   :   0 muls  :   0 
-mulsu :   0 neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :  21 
-pop   :   3 push  :   3 rcall :   4 ret   :   4 reti  :   3 rjmp  :  13 
+cpi   :  13 cpse  :   0 dec   :   3 elpm  :   0 eor   :   0 fmul  :   0 
+fmuls :   0 fmulsu:   0 icall :   0 ijmp  :   0 in    :   1 inc   :   2 
+jmp   :   0 ld    :   4 ldd   :   0 ldi   :  56 lds   :   0 lpm   :   0 
+lsl   :   0 lsr   :   0 mov   :   1 movw  :   0 mul   :   0 muls  :   0 
+mulsu :   0 neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :  27 
+pop   :   6 push  :   6 rcall :   5 ret   :   5 reti  :   3 rjmp  :  26 
 rol   :   0 ror   :   0 sbc   :   0 sbci  :   0 sbi   :   0 sbic  :   0 
-sbis  :   0 sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :   0 sec   :   0 
-seh   :   0 sei   :   3 sen   :   0 ser   :   0 ses   :   0 set   :   0 
+sbis  :   0 sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :   3 sec   :   0 
+seh   :   0 sei   :   4 sen   :   0 ser   :   0 ses   :   0 set   :   0 
 sev   :   0 sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 
 sts   :   6 sub   :   0 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
 
-Instructions used: 17 out of 114 (14.9%)
+Instructions used: 21 out of 114 (18.4%)
 
 "ATmega128" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000188    266      0    266  131072   0.2%
+[.cseg] 0x000000 0x00020c    398      0    398  131072   0.3%
 [.dseg] 0x000100 0x000100      0      0      0    4096   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    4096   0.0%
 

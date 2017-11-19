@@ -1,10 +1,10 @@
 
-AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_remote\main.asm Mon Nov 13 13:12:40 2017
+AVRASM ver. 2.2.6  D:\win_dev\avr-bot\lab8_remote\main.asm Sat Nov 18 22:17:51 2017
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
-\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_remote\main.asm(16): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
+D:\win_dev\avr-bot\lab8_remote\main.asm(16): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
-\\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\Desktop\avr-bot\lab8_remote\main.asm(16): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
+D:\win_dev\avr-bot\lab8_remote\main.asm(16): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc'
                                  
                                  ;***********************************************************
                                  
@@ -1288,6 +1288,17 @@ AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\De
                                  ;*	Internal Register Definitions and Constants
                                  ;***********************************************************
                                  .def	mpr = r16				; Multi-Purpose Register
+                                 .def	sendcode = r17
+                                 .def	lastpress = r18
+                                 .def	command = r19
+                                 
+                                 .equ	Button0 = 0
+                                 .equ	Button1 = 1
+                                 .equ	Button2 = 2
+                                 .equ	Button3 = 4
+                                 .equ	Button4 = 5
+                                 .equ	Button5 = 6
+                                 
                                  
                                  .equ	EngEnR = 4				; Right Engine Enable Bit
                                  .equ	EngEnL = 7				; Left Engine Enable Bit
@@ -1301,7 +1312,9 @@ AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\De
                                  .equ	TurnR =   ($80|1<<(EngDirL-1))					;0b10100000 Turn Right Action Code
                                  .equ	TurnL =   ($80|1<<(EngDirR-1))					;0b10010000 Turn Left Action Code
                                  .equ	Halt =    ($80|1<<(EngEnR-1)|1<<(EngEnL-1))		;0b11001000 Halt Action Code
+                                 .equ	Freeze = 0b11111000
                                  
+                                 .equ	BotAddress = 0b00011001
                                  ;***********************************************************
                                  ;*	Start of Code Segment
                                  ;***********************************************************
@@ -1312,7 +1325,6 @@ AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\De
                                  ;***********************************************************
                                  .org	$0000					; Beginning of IVs
 000000 c045                      		rjmp 	INIT			; Reset interrupt
-                                 
                                  .org	$0046					; End of Interrupt Vectors
                                  
                                  ;***********************************************************
@@ -1324,34 +1336,136 @@ AVRASM ver. 2.2.6  \\depot.engr.oregonstate.edu\users\luukh\Windows.Documents\De
 000047 bf0d                      	out		SPL, mpr			
 000048 e100                      	ldi		mpr, high(RAMEND)
 000049 bf0e                      	out		SPH, mpr
-                                 	;I/O Ports
+                                 	;I/O 
+                                 	; Initialize Port B for output, this is for debugging what's going on with the transmitter
+00004a ef0f                      		ldi		mpr, $FF
+00004b bb07                      		out		DDRB, mpr
+00004c e000                      		ldi		mpr, $00		; Initialize Port B Data Register
+00004d bb08                      		out		PORTB, mpr		; so all Port B outputs are low	
+                                 	; Set Port D Data Direction Register
+00004e e000                      	ldi		mpr, (0<<Button0|0<<Button1|0<<Button2|0<<Button3|0<<Button4|0<<Button5)		
+00004f bb01                      	out		DDRD, mpr		; for input
+                                 	; Initialize Port D Data Register
+000050 e707                      	ldi		mpr, (1<<Button0|1<<Button1|1<<Button2|1<<Button3|1<<Button4|1<<Button5)
+000051 bb02                      	out		PORTD, mpr		; all Port D inputs are Tri-State
                                  	;USART1
-00004a e000                      	ldi		mpr, 0 ;asynchronous normal mode
-00004b 9300 009b                 	sts		UCSR1A, mpr
+000052 e000                      	ldi		mpr, 0 ;asynchronous normal mode
+000053 9300 009b                 	sts		UCSR1A, mpr
                                  	;Set baudrate at 2400bps, UBRR = 416
-00004d e001                      	ldi		mpr, high(416)
-00004e 9300 0098                 	sts		UBRR1H, mpr
-000050 ea00                      	ldi		mpr, low(416)
-000051 9300 0099                 	sts		UBRR1L, mpr
-                                 		;Enable transmitter and enable transmit interrupts
-000053 e408                      	ldi		mpr, (1<<TXEN1|1<<TXCIE1)
-000054 9300 009a                 	sts		UCSR1B, mpr
+000055 e001                      	ldi		mpr, high(416)
+000056 9300 0098                 	sts		UBRR1H, mpr
+000058 ea00                      	ldi		mpr, low(416)
+000059 9300 0099                 	sts		UBRR1L, mpr
+                                 		;Enable transmitter
+00005b e008                      	ldi		mpr, (1<<TXEN1)
+00005c 9300 009a                 	sts		UCSR1B, mpr
                                  		;Set frame format: 8 data bits, 2 stop bits
-000056 e00e                      	ldi		mpr, (1<<USBS1|1<<UCSZ11|1<<UCSZ10)
-000057 9300 009d                 	sts		UCSR1C, mpr
+00005e e00e                      	ldi		mpr, (1<<USBS1|1<<UCSZ11|1<<UCSZ10)
+00005f 9300 009d                 	sts		UCSR1C, mpr
                                  	;Other
                                  
                                  ;***********************************************************
                                  ;*	Main Program
                                  ;***********************************************************
                                  MAIN:
-                                 	;TODO: ???
-000059 cfff                      		rjmp	MAIN
+000061 d001                      	rcall PollForInput
+000062 cffe                      	rjmp	MAIN
                                  
                                  ;***********************************************************
                                  ;*	Functions and Subroutines
                                  ;***********************************************************
+                                 PollForInput:
+000063 b300                      	in mpr, PIND
+000064 2701                      	eor mpr, sendcode
+000065 9488                      	clc
+000066 1720                      	cp  lastpress, mpr
+000067 f0c1                      	breq Next7
+000068 2f20                      	mov lastpress, mpr
+000069 ff00                      	sbrs mpr, Button0
+00006a c002                      	rjmp Next1
+00006b d016                      	rcall SendMovFwd
+00006c c013                      	rjmp Next7 
+                                 Next1:
+00006d ff01                      	sbrs mpr, Button1
+00006e c002                      	rjmp Next2
+00006f d015                      	rcall SendMovBck
+000070 c00f                      	rjmp Next7 
+                                 Next2:
+000071 ff02                      	sbrs mpr, Button2
+000072 c002                      	rjmp Next3
+000073 d014                      	rcall SendTurnR
+000074 c00b                      	rjmp Next7 
+                                 Next3:
+000075 ff04                      	sbrs mpr, Button3
+000076 c002                      	rjmp Next4
+000077 d013                      	rcall SendTurnL
+000078 c007                      	rjmp Next7 
+                                 Next4:
+000079 ff05                      	sbrs mpr, Button4
+00007a c002                      	rjmp Next5
+00007b d012                      	rcall SendHalt
+00007c c003                      	rjmp Next7
+                                 Next5:
+00007d ff06                      	sbrs mpr, Button5
+00007e c001                      	rjmp Next7
+00007f d011                      	rcall SendFreeze
+                                 Next7:
+                                 	
+000080 e000                      	ldi mpr, 0
+000081 9508                      	ret
+                                 	
                                  
+                                 SendMovFwd:
+000082 eb30                      	ldi command, MovFwd
+000083 d010                      	rcall USART1_Transmit_Command
+                                 	
+000084 9508                      	ret
+                                 
+                                 SendMovBck:
+000085 e830                      	ldi	command, MovBck
+000086 d00d                      	rcall USART1_Transmit_Command
+                                 	
+000087 9508                      	ret
+                                 
+                                 SendTurnR:
+000088 ea30                      	ldi command, TurnR
+000089 d00a                      	rcall USART1_Transmit_Command
+                                 	
+00008a 9508                      	ret
+                                 
+                                 SendTurnL:
+00008b e930                      	ldi command, TurnL
+00008c d007                      	rcall USART1_Transmit_Command
+                                 	
+00008d 9508                      	ret
+                                 
+                                 SendHalt:
+00008e ec38                      	ldi command, Halt
+00008f d004                      	rcall USART1_Transmit_Command
+                                 	
+000090 9508                      	ret
+                                 
+                                 SendFreeze:
+000091 ef38                      	ldi command, Freeze
+000092 d001                      	rcall USART1_Transmit_Command
+                                 	
+000093 9508                      	ret
+                                 
+                                 USART1_Transmit_Command:
+000094 e119                      	ldi		sendcode, BotAddress
+000095 d003                      	rcall USART1_Transmit
+000096 2f13                      	mov		sendcode, command
+000097 d001                      	rcall USART1_Transmit
+000098 9508                      	ret
+                                 USART1_Transmit:
+                                 	
+000099 e0b0                      	ldi		XH, high(UCSR1A)
+00009a e9ab                      	ldi		XL, low(UCSR1A)
+00009b 910c                      	ld		mpr, X
+00009c ff05                      	sbrs	mpr, UDRE1
+00009d cffb                      	rjmp	USART1_Transmit
+00009e 9310 009c                 	sts		UDR1, sendcode
+0000a0 9508                      	ret
                                  ;***********************************************************
                                  ;*	Stored Program Data
                                  ;***********************************************************
@@ -1376,40 +1490,40 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega128" register use summary:
-x  :   0 y  :   0 z  :   0 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
+x  :   1 y  :   0 z  :   0 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:  14 r17:   0 r18:   0 r19:   0 r20:   0 
-r21:   0 r22:   0 r23:   0 r24:   0 r25:   0 r26:   0 r27:   0 r28:   0 
+r13:   0 r14:   0 r15:   0 r16:  35 r17:   4 r18:   2 r19:   7 r20:   0 
+r21:   0 r22:   0 r23:   0 r24:   0 r25:   0 r26:   1 r27:   1 r28:   0 
 r29:   0 r30:   0 r31:   0 
-Registers used: 1 out of 35 (2.9%)
+Registers used: 7 out of 35 (20.0%)
 
 "ATmega128" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :   0 brge  :   0 brhc  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :   1 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
 brne  :   0 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
 brvs  :   0 bset  :   0 bst   :   0 call  :   0 cbi   :   0 cbr   :   0 
-clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :   0 cls   :   0 
-clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 
-cpi   :   0 cpse  :   0 dec   :   0 elpm  :   0 eor   :   0 fmul  :   0 
-fmuls :   0 fmulsu:   0 icall :   0 ijmp  :   0 in    :   0 inc   :   0 
-jmp   :   0 ld    :   0 ldd   :   0 ldi   :   7 lds   :   0 lpm   :   0 
-lsl   :   0 lsr   :   0 mov   :   0 movw  :   0 mul   :   0 muls  :   0 
-mulsu :   0 neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :   2 
-pop   :   0 push  :   0 rcall :   0 ret   :   0 reti  :   0 rjmp  :   2 
+clc   :   1 clh   :   0 cli   :   0 cln   :   0 clr   :   0 cls   :   0 
+clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   1 cpc   :   0 
+cpi   :   0 cpse  :   0 dec   :   0 elpm  :   0 eor   :   1 fmul  :   0 
+fmuls :   0 fmulsu:   0 icall :   0 ijmp  :   0 in    :   1 inc   :   0 
+jmp   :   0 ld    :   1 ldd   :   0 ldi   :  21 lds   :   0 lpm   :   0 
+lsl   :   0 lsr   :   0 mov   :   2 movw  :   0 mul   :   0 muls  :   0 
+mulsu :   0 neg   :   0 nop   :   0 or    :   0 ori   :   0 out   :   6 
+pop   :   0 push  :   0 rcall :  15 ret   :   9 reti  :   0 rjmp  :  14 
 rol   :   0 ror   :   0 sbc   :   0 sbci  :   0 sbi   :   0 sbic  :   0 
-sbis  :   0 sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :   0 sec   :   0 
+sbis  :   0 sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :   7 sec   :   0 
 seh   :   0 sei   :   0 sen   :   0 ser   :   0 ses   :   0 set   :   0 
 sev   :   0 sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 
-sts   :   5 sub   :   0 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
+sts   :   6 sub   :   0 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
 
-Instructions used: 4 out of 114 (3.5%)
+Instructions used: 14 out of 114 (12.3%)
 
 "ATmega128" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x0000b4     42      0     42  131072   0.0%
+[.cseg] 0x000000 0x000142    184      0    184  131072   0.1%
 [.dseg] 0x000100 0x000100      0      0      0    4096   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    4096   0.0%
 
