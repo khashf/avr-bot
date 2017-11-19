@@ -28,6 +28,7 @@
 .def	hitSide = r21			; flag indicating bot was hit left the last time
 .def	buffer = r22			; buffer for received incoming data frame
 .def	ExpectingData = r23
+.def	currentmotion = r24
 ;***********************************************************
 ;*	Constants
 ;***********************************************************
@@ -109,8 +110,8 @@ INIT:
 		ldi		mpr, (1<<WskrL|1<<WskrR)		; Initialize Port D Data Register
 		out		PORTD, mpr						; so all Port D inputs are Tri-State
 	; Initialize TekBot Forward Movement
-		ldi		mpr, MovFwd						; Load Move Forward Command
-		out		PORTB, mpr						; Send command to motors
+		ldi		currentmotion, MovFwd						; Load Move Forward Command
+		out		PORTB, currentmotion					; Send command to motors
 	; Initialize Turn-around behavior Flags
 		ldi		nHits, 0						; 
 		ldi		hitSide, WasNeither
@@ -125,7 +126,8 @@ INIT:
 		ldi		mpr, low(416)
 		sts		UBRR1L, mpr
 		; Enable receiver and enable receive interrupts
-		ldi		mpr, (1<<RXEN1);|(1<<RXCIE1)
+		;ldi		mpr, (1<<RXEN1)
+		ldi		mpr, (1<<RXEN1|1<<RXCIE1) ;uncomment this to enable interrupt behavior
 		sts		UCSR1B, mpr
 		; Set frame format: 8 data bits, 2 stop bits
 		ldi		mpr, (1<<USBS1|1<<UCSZ11|1<<UCSZ10)
@@ -144,34 +146,16 @@ INIT:
 ;*	Main Program
 ;***********************************************************
 MAIN:
-		rcall PollReceive
-		;ldi		mpr, MovFwd		; the bot always move forward by default when not turning
-		;out		PORTB, mpr		; 
+		;rcall UsartPollReceive
 		rjmp	MAIN
 
-PollReceive:
-		ldi XH, high(UCSR1A)
-		ldi	XL, low(UCSR1A)
-		ld mpr, X
+/*UsartPollReceive:
+		lds mpr, UCSR1A
 		sbrs mpr, RXC1
-		rjmp PollReceive
-		ldi XH, high(UDR1)
-		ldi XL, low(UDR1)
-		ld mpr, X
-		out		PORTB, mpr
-		ret
-		
-		/*sbrs mpr, RXC1
-		rjmp PollReceive
-		ldi		mpr, 1
-		out		PORTB, mpr
-
-		ldi XH, high(UDR1)
-		ldi	XL, low(UDR1)
-		ld	mpr, X
+		rjmp UsartPollReceive
+		lds mpr, UDR1
 		out PORTB, mpr
 		ret*/
-
 ;-----------------------------------------------------------
 ; Func: HitRight()
 ; Desc: React when the right whisker is hit
@@ -313,21 +297,17 @@ USART1_RXC:
 		push	waitcnt			; Save wait register
 		in		mpr, SREG		; Save program state
 		push	mpr				;
-
+		
 		; is this address or data?
 ReceiveLoop:
 		ldi		XH, high(UCSR1A)
 		ldi		XL, low(UCSR1A)
 		ld		mpr, X
 		sbrs	mpr, RXC1
-		rjmp ReceiveLoop
-
-
+		rjmp	ReceiveLoop
 		ldi		XH, high(UDR1)
 		ldi		XL, low(UDR1)
-		ld      mpr, X
-		;out     PORTB, mpr
-		;rjmp	END
+		ld		mpr, X
 		sbrs	mpr, UDR17		; check the MSB
 		rjmp	RECEIVE_ADDRESS ; receive address
 		rjmp	RECEIVE_DATA	; otherwise, receive data
@@ -381,28 +361,28 @@ LOOK_UP_COMMAND:
 		rjmp	END
 
 GoLeft:
-		ldi		mpr, TurnL
-		out		PORTB, mpr
+		ldi		currentmotion, TurnL
+		out		PORTB, currentmotion
 		rjmp	END
 
 GoRight:
-		ldi		mpr, TurnR
-		out		PORTB, mpr
+		ldi		currentmotion, TurnR
+		out		PORTB, currentmotion
 		rjmp	END
 
 GoForward:
-		ldi		mpr, MovFwd
-		out		PORTB, mpr
+		ldi		currentmotion, MovFwd
+		out		PORTB, currentmotion
 		rjmp	END
 
 GoBackward:
-		ldi		mpr, MovBck
-		out		PORTB, mpr
+		ldi		currentmotion, MovBck
+		out		PORTB, currentmotion
 		rjmp	END
 
 SetHalt:
-		ldi		mpr, Halt
-		out		PORTB, mpr
+		ldi		currentmotion, Halt
+		out		PORTB, currentmotion
 		rjmp	END
 
 END:
@@ -411,8 +391,8 @@ END:
 		out		SREG, mpr	;
 		pop		waitcnt		; Restore wait register
 		pop		mpr		; Restore mpr
-		; set global interrupt back		
-		sei
+		; set global interrupt back
+		sei		
 
 		ret
 
