@@ -147,14 +147,28 @@ INIT:
 ;***********************************************************
 MAIN:
 		out		PORTB, currentmotion
+		;rcall UsartPollReceive
 		rjmp	MAIN
 
 /*UsartPollReceive:
 		lds mpr, UCSR1A
+		out PORTB, mpr
 		sbrs mpr, RXC1
-		rjmp UsartPollReceive
+		rjmp PollSkip
+ReadUDR1:
 		lds mpr, UDR1
 		out PORTB, mpr
+PollSkip:
+		lds mpr, UCSR1A
+		sbrs mpr, FE1 ;this will be written to 0 when you read UDR1
+		rjmp PollSkip
+		rcall Wait
+		lds mpr, UCSR1B
+		out PORTB, mpr
+		rcall Wait
+		lds mpr, UCSR1C
+		out PORTB, mpr
+		rcall WAIT
 		ret*/
 ;-----------------------------------------------------------
 ; Func: HitRight()
