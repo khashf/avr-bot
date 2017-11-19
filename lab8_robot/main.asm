@@ -146,7 +146,7 @@ INIT:
 ;*	Main Program
 ;***********************************************************
 MAIN:
-		;rcall UsartPollReceive
+		out		PORTB, currentmotion
 		rjmp	MAIN
 
 /*UsartPollReceive:
