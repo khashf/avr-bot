@@ -20,8 +20,11 @@
 ;***********************************************************
 .def	mpr = r16				; Multi-Purpose Register
 .def	sendcode = r17
-.def	lastpress = r18
+.def	lastcommand = r18
 .def	command = r19
+.def	waitcnt = r20			; Wait Loop Counter
+.def	ilcnt = r21				; Inner Loop Counter
+.def	olcnt = r22				; Outer Loop Counter
 
 .equ	Button0 = 0
 .equ	Button1 = 1
@@ -106,80 +109,58 @@ MAIN:
 ;*	Functions and Subroutines
 ;***********************************************************
 PollForInput:
+	ldi waitcnt, 10
+	out PORTB, lastcommand
 	in mpr, PIND
-	eor mpr, sendcode
-	clc
-	cp  lastpress, mpr
-	breq Next7
-	mov lastpress, mpr
 	sbrs mpr, Button0
-	rjmp Next1
-	rcall SendMovFwd
-	rjmp Next7 
-Next1:
+	rjmp sendMovFwd
 	sbrs mpr, Button1
-	rjmp Next2
-	rcall SendMovBck
-	rjmp Next7 
-Next2:
+	rjmp sendMovBck
 	sbrs mpr, Button2
-	rjmp Next3
-	rcall SendTurnR
-	rjmp Next7 
-Next3:
+	rjmp sendTurnR
 	sbrs mpr, Button3
-	rjmp Next4
-	rcall SendTurnL
-	rjmp Next7 
-Next4:
+	rjmp sendTurnL
 	sbrs mpr, Button4
-	rjmp Next5
-	rcall SendHalt
-	rjmp Next7
-Next5:
+	rjmp sendHalt
 	sbrs mpr, Button5
-	rjmp Next7
-	rcall SendFreeze
-Next7:
-	
-	ldi mpr, 0
+	rjmp sendFreeze
 	ret
 	
 
 SendMovFwd:
 	ldi command, MovFwd
 	rcall USART1_Transmit_Command
-	
+	rcall Wait
 	ret
 
 SendMovBck:
 	ldi	command, MovBck
 	rcall USART1_Transmit_Command
-	
+	rcall Wait
 	ret
 
 SendTurnR:
 	ldi command, TurnR
 	rcall USART1_Transmit_Command
-	
+	rcall Wait
 	ret
 
 SendTurnL:
 	ldi command, TurnL
 	rcall USART1_Transmit_Command
-	
+	rcall Wait
 	ret
 
 SendHalt:
 	ldi command, Halt
 	rcall USART1_Transmit_Command
-	
+	rcall Wait
 	ret
 
 SendFreeze:
 	ldi command, Freeze
 	rcall USART1_Transmit_Command
-	
+	rcall Wait
 	ret
 
 USART1_Transmit_Command:
@@ -187,6 +168,7 @@ USART1_Transmit_Command:
 	rcall USART1_Transmit
 	mov		sendcode, command
 	rcall USART1_Transmit
+	mov		lastcommand, command
 	ret
 USART1_Transmit:
 	
@@ -194,9 +176,28 @@ USART1_Transmit:
 	ldi		XL, low(UCSR1A)
 	ld		mpr, X
 	sbrs	mpr, UDRE1
-	rjmp	USART1_Transmit
+	rjmp	USART1_Transmit	
 	sts		UDR1, sendcode
 	ret
+
+Wait:
+		push	waitcnt			; Save wait register
+		push	ilcnt			; Save ilcnt register
+		push	olcnt			; Save olcnt register
+
+Loop:	ldi		olcnt, 224		; load olcnt register
+OLoop:	ldi		ilcnt, 237		; load ilcnt register
+ILoop:	dec		ilcnt			; decrement ilcnt
+		brne	ILoop			; Continue Inner Loop
+		dec		olcnt		; decrement olcnt
+		brne	OLoop			; Continue Outer Loop
+		dec		waitcnt		; Decrement wait 
+		brne	Loop			; Continue Wait loop	
+
+		pop		olcnt		; Restore olcnt register
+		pop		ilcnt		; Restore ilcnt register
+		pop		waitcnt		; Restore wait register
+		ret				; Return from subroutine
 ;***********************************************************
 ;*	Stored Program Data
 ;***********************************************************
