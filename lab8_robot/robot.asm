@@ -64,9 +64,9 @@
 .equ	Halt =    (1<<EngEnR|1<<EngEnL)		;0b10010000 Halt Action Code
 
 .equ	MovFwdCmd =  ($80|1<<(EngDirR-1)|1<<(EngDirL-1))	;0b01100000 Move Forward Action Code
-.equ	MovBckCmd =  ($80|$00)						;0b00000000 Move Backward Action Code
-.equ	TurnRCmd =   ($80|1<<(EngDirL-1))				;0b01000000 Turn Right Action Code
-.equ	TurnLCmd =   ($80|1<<(EngDirR-1))				;0b00100000 Turn Left Action Code
+.equ	MovBckCmd =  ($80|$00)								;0b00000000 Move Backward Action Code
+.equ	TurnRCmd =   ($80|1<<(EngDirL-1))					;0b01000000 Turn Right Action Code
+.equ	TurnLCmd =   ($80|1<<(EngDirR-1))					;0b00100000 Turn Left Action Code
 .equ	HaltCmd =    ($80|1<<(EngEnR-1)|1<<(EngEnL-1))		;0b10010000 Halt Action Code
 
 ;***********************************************************
@@ -116,7 +116,7 @@ INIT:
 		ldi		nHits, 0						; 
 		ldi		hitSide, WasNeither
 		ldi		ExpectingData, 0
-	; USART1
+	; Configure USART1
 		; Set asynchronous normal mode
 		ldi		mpr, 0 
 		sts		UCSR1A, mpr
@@ -126,8 +126,8 @@ INIT:
 		ldi		mpr, low(416)
 		sts		UBRR1L, mpr
 		; Enable receiver and enable receive interrupts
-		;ldi		mpr, (1<<RXEN1)
-		ldi		mpr, (1<<RXEN1|1<<RXCIE1) ;uncomment this to enable interrupt behavior
+		;ldi		mpr, (1<<RXEN1)			; uncomment this to use polling method
+		ldi		mpr, (1<<RXEN1|1<<RXCIE1)	; uncomment this to use interrupt method
 		sts		UCSR1B, mpr
 		; Set frame format: 8 data bits, 2 stop bits
 		ldi		mpr, (1<<USBS1|1<<UCSZ11|1<<UCSZ10)
@@ -139,7 +139,7 @@ INIT:
 		; Configure the External Interrupt Mask
 		ldi		mpr, (1<<INT0|1<<INT1)
 		out		EIMSK, mpr
-		; Turn on interrupts
+	; Turn on global interrupts
 		sei
 
 ;***********************************************************
@@ -147,10 +147,14 @@ INIT:
 ;***********************************************************
 MAIN:
 		out		PORTB, currentmotion
-		;rcall UsartPollReceive
+		;rcall UsartPollReceive		; uncomment this if use input-polling
 		rjmp	MAIN
 
-/*UsartPollReceive:
+;-----------------------------------------------------------
+; Func: UsartPollReceive()
+; Desc: Support function for polling input
+;-----------------------------------------------------------
+UsartPollReceive:
 		lds mpr, UCSR1A
 		out PORTB, mpr
 		sbrs mpr, RXC1
@@ -169,7 +173,8 @@ PollSkip:
 		lds mpr, UCSR1C
 		out PORTB, mpr
 		rcall WAIT
-		ret*/
+		ret
+
 ;-----------------------------------------------------------
 ; Func: HitRight()
 ; Desc: React when the right whisker is hit
@@ -312,13 +317,14 @@ USART1_RXC:
 		in		mpr, SREG		; Save program state
 		push	mpr				;
 		
-		; is this address or data?
+		; is this an address package or a data package?
 ReceiveLoop:
 		ldi		XH, high(UCSR1A)
 		ldi		XL, low(UCSR1A)
 		ld		mpr, X
 		sbrs	mpr, RXC1
 		rjmp	ReceiveLoop
+
 		ldi		XH, high(UDR1)
 		ldi		XL, low(UDR1)
 		ld		mpr, X
