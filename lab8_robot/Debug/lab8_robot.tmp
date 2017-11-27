@@ -1,0 +1,55 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.6</VERSION>
+ <DEVICE>"ATmega128"</DEVICE>
+ <WORKING_DIR>D:\win_dev\avr-bot\lab8_robot\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.2.132\avrasm\inc\m128def.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>D:\win_dev\avr-bot\lab8_robot\Debug\lab8_robot.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>lab8_robot.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>lab8_robot.map</FILE>
+  <FILE>lab8_robot.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <INIT><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>95</LINE></INIT>
+  <HitRight><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>180</LINE></HitRight>
+  <HitLeft><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>246</LINE></HitLeft>
+  <USART1_RXC><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>310</LINE></USART1_RXC>
+  <MAIN><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>146</LINE></MAIN>
+  <PollReceive><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>152</LINE></PollReceive>
+  <Wait><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>424</LINE></Wait>
+  <CountAltTurnRight><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>204</LINE></CountAltTurnRight>
+  <SetTurnLeftTime><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>218</LINE></SetTurnLeftTime>
+  <SetTurnAroundTimeInLeft><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>212</LINE></SetTurnAroundTimeInLeft>
+  <TurnLeft><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>223</LINE></TurnLeft>
+  <CountAltTurnLeft><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>270</LINE></CountAltTurnLeft>
+  <SetTurnRightTime><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>284</LINE></SetTurnRightTime>
+  <SetTurnAroundTimeInRight><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>278</LINE></SetTurnAroundTimeInRight>
+  <TurnRight><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>289</LINE></TurnRight>
+  <ReceiveLoop><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>318</LINE></ReceiveLoop>
+  <RECEIVE_ADDRESS><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>335</LINE></RECEIVE_ADDRESS>
+  <RECEIVE_DATA><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>348</LINE></RECEIVE_DATA>
+  <START_EXPECTING_DATA><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>344</LINE></START_EXPECTING_DATA>
+  <END><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>408</LINE></END>
+  <LOOK_UP_COMMAND><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>360</LINE></LOOK_UP_COMMAND>
+  <GoLeft><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>383</LINE></GoLeft>
+  <GoRight><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>388</LINE></GoRight>
+  <GoForward><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>393</LINE></GoForward>
+  <GoBackward><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>398</LINE></GoBackward>
+  <SetHalt><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>403</LINE></SetHalt>
+  <Loop><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>429</LINE></Loop>
+  <OLoop><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>430</LINE></OLoop>
+  <ILoop><FILE>D:\win_dev\avr-bot\lab8_robot\main.asm</FILE><LINE>431</LINE></ILoop>
+ </LABELS>
+</ASSEMBLER_INFO>

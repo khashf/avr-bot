@@ -5,13 +5,14 @@
 *.suo
 *.cproj
 *.user
-*.xml
-*.asmproj
 *.tmp
 *.obj
 *.lss
 *.map
 *.hex
+
+*.xml
+!*.asmproj
 
 # subdirectories
 .vs/
