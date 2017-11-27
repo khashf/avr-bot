@@ -27,7 +27,7 @@
 .def	nHits = r20				; Number of continual alternative whisker hits
 .def	hitSide = r21			; flag indicating bot was hit left the last time
 .def	buffer = r22			; buffer for received incoming data frame
-.def	ExpectingData = r23
+.def	ReceiverSR = r23
 .def	currentmotion = r24
 ;***********************************************************
 ;*	Constants
@@ -49,6 +49,11 @@
 .equ	WasNeither = 2			; The last hit was neither right nor left hit
 								; (can be the first time the bot startup,
 								; or after the bot just turned around
+.equ	ExpectingData = 0
+.equ	SkipFreezeFlag = 1
+.equ    FreezeCnt1 = 2
+.equ	FreezeCnt2 = 3
+.equ	Frozen = 4
 
 
 ; USARTs
@@ -68,6 +73,7 @@
 .equ	TurnRCmd =   ($80|1<<(EngDirL-1))				;0b01000000 Turn Right Action Code
 .equ	TurnLCmd =   ($80|1<<(EngDirR-1))				;0b00100000 Turn Left Action Code
 .equ	HaltCmd =    ($80|1<<(EngEnR-1)|1<<(EngEnL-1))		;0b10010000 Halt Action Code
+.equ	FreezeCmd = 0b11111000
 
 ;***********************************************************
 ;*	Start of Code Segment
@@ -115,7 +121,7 @@ INIT:
 	; Initialize Turn-around behavior Flags
 		ldi		nHits, 0						; 
 		ldi		hitSide, WasNeither
-		ldi		ExpectingData, 0
+		ldi		ReceiverSR, 0
 	; USART1
 		; Set asynchronous normal mode
 		ldi		mpr, 0 
@@ -127,7 +133,7 @@ INIT:
 		sts		UBRR1L, mpr
 		; Enable receiver and enable receive interrupts
 		;ldi		mpr, (1<<RXEN1)
-		ldi		mpr, (1<<RXEN1|1<<RXCIE1) ;uncomment this to enable interrupt behavior
+		ldi		mpr, (1<<TXEN1|1<<RXEN1|1<<RXCIE1) ;uncomment this to enable interrupt behavior
 		sts		UCSR1B, mpr
 		; Set frame format: 8 data bits, 2 stop bits
 		ldi		mpr, (1<<USBS1|1<<UCSZ11|1<<UCSZ10)
@@ -147,6 +153,7 @@ INIT:
 ;***********************************************************
 MAIN:
 		out		PORTB, currentmotion
+		;out		PORTB, ReceiverSR
 		;rcall UsartPollReceive
 		rjmp	MAIN
 
@@ -313,6 +320,7 @@ USART1_RXC:
 		push	mpr				;
 		
 		; is this address or data?
+		out		PORTB, ReceiverSR
 ReceiveLoop:
 		ldi		XH, high(UCSR1A)
 		ldi		XL, low(UCSR1A)
@@ -330,13 +338,44 @@ RECEIVE_ADDRESS:
 		; if it's an address (start with 0)
 		;	if address match
 		;		turn on the expect_data flag
+		cpi		mpr, 0b01010101 ;this is the freeze command sent from another bot
+		breq	FREEZE_HANDLE
 		cpi		mpr, ThisBotAddress
 		;out		PORTB, mpr
 		breq	START_EXPECTING_DATA
 		rjmp	END
 
+FREEZE_HANDLE:
+		sbrc	ReceiverSR, SkipFreezeFlag
+		breq	FREEZE_SKIP
+		;add check to see if this bot just sent a freeze command or not
+		ldi		mpr, Halt
+		out		PORTB, mpr
+		ldi		waitcnt, 100
+		ldi		ilcnt, 5
+FREEZE_LOOP:
+		rcall	Wait
+		dec ilcnt
+		cpi	ilcnt, 0
+		brne FREEZE_LOOP
+FREEZE_INC:
+		sbrc	ReceiverSR, FreezeCnt2 ;this must be the third freeze, loop forever
+		rjmp	FREEZE_INF_LOOP
+		sbrc	ReceiverSR, FreezeCnt1
+		sbr		ReceiverSR, (1<<FreezeCnt2) ;set freezecnt2 to true
+		sbrs	ReceiverSR, FreezeCnt1
+		sbr		ReceiverSR, (1<<FreezeCnt1) ;set freezecnt1 to true
+		rjmp	END
+FREEZE_INF_LOOP:
+		rjmp	FREEZE_INF_LOOP
+
+FREEZE_SKIP:
+		cbr		ReceiverSR, (1<<SkipFreezeFlag)
+		rjmp	END
+
 START_EXPECTING_DATA:
-		ldi		ExpectingData, 1	; turn on the expect_data flag
+		sbr		ReceiverSR, (1<<ExpectingData)	; turn on the expect_data flag expecting a command (0 = expecting_data, 1 = ignore freeze)
+		cbr		ReceiverSR, (1<<SkipFreezeFlag)
 		rjmp	END
 
 RECEIVE_DATA:
@@ -347,8 +386,8 @@ RECEIVE_DATA:
 		;		turn off expect_data flag
 
 		; if flag is set
-		cpi		ExpectingData, 1	
-		breq	LOOK_UP_COMMAND
+		sbrc	ReceiverSR, ExpectingData	
+		rjmp	LOOK_UP_COMMAND
 		rjmp	END
 
 LOOK_UP_COMMAND:
@@ -359,7 +398,7 @@ LOOK_UP_COMMAND:
 		mov		buffer, mpr ;mpr already contains the 
 
 		; turn off expect_data flag
-		ldi		ExpectingData, 0
+		cbr		ReceiverSR, (1<<ExpectingData)
 
 		; compare with each address
 		cpi		buffer, TurnLCmd
@@ -372,6 +411,8 @@ LOOK_UP_COMMAND:
 		breq	GoBackward
 		cpi		buffer, HaltCmd
 		breq	SetHalt
+		cpi		buffer, FreezeCmd
+		breq	SendFreeze
 		rjmp	END
 
 GoLeft:
@@ -397,6 +438,15 @@ GoBackward:
 SetHalt:
 		ldi		currentmotion, Halt
 		out		PORTB, currentmotion
+		rjmp	END
+
+SendFreeze:
+		lds		mpr, UCSR1A
+		sbrs	mpr, UDRE1
+		rjmp	SendFreeze
+		ldi		mpr, 0b01010101
+		sts		UDR1, mpr
+		sbr		ReceiverSR, (1<<SkipFreezeFlag)
 		rjmp	END
 
 END:

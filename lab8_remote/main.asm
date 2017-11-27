@@ -32,6 +32,7 @@
 .equ	Button3 = 4
 .equ	Button4 = 5
 .equ	Button5 = 6
+.equ	Button6 = 7
 
 
 .equ	EngEnR = 4				; Right Engine Enable Bit
@@ -124,6 +125,8 @@ PollForInput:
 	rjmp sendHalt
 	sbrs mpr, Button5
 	rjmp sendFreeze
+	sbrs mpr, Button6
+	rjmp sendFreezeTest
 	ret
 	
 
@@ -160,6 +163,13 @@ SendHalt:
 SendFreeze:
 	ldi command, Freeze
 	rcall USART1_Transmit_Command
+	rcall Wait
+	ret
+
+SendFreezeTest:
+	ldi sendcode, 0b01010101
+	rcall USART1_Transmit
+	mov lastcommand, sendcode
 	rcall Wait
 	ret
 
