@@ -118,7 +118,7 @@ INIT:
 	; Initialize TekBot Forward Movement
 		ldi		currentmotion, MovFwd						; Load Move Forward Command
 		out		PORTB, currentmotion					; Send command to motors
-	; Initialize Turn-around behavior Flags
+	; Initialize Logic-Control Flags
 		ldi		nHits, 0						; 
 		ldi		hitSide, WasNeither
 		ldi		ReceiverSR, 0
